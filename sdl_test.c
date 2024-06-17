@@ -91,7 +91,7 @@ int main(int argc, char* argv[]) {
         SDL_DestroyWindow(window);
         TTF_Quit();
         SDL_Quit();
-        return 1;
+        return 1;  
     }
 
     fonts.font48 = TTF_OpenFont("/path/to/font.ttf", 48);
@@ -118,8 +118,6 @@ int main(int argc, char* argv[]) {
     if (prevButton.texture == NULL || nextButton.texture == NULL) {
         SDL_DestroyTexture(prevButton.texture);
         SDL_DestroyTexture(nextButton.texture);
-        TTF_CloseFont(fonts.font24);
-        TTF_CloseFont(fonts.font48);
         SDL_DestroyRenderer(renderer);
         SDL_DestroyWindow(window);
         TTF_Quit();

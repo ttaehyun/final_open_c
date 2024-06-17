@@ -7,6 +7,13 @@
 
 #define MAX_LINE_LENGTH 1024
 
+void logSDLError(const char *msg) {
+    fprintf(stderr, "%s error: %s\n", msg, SDL_GetError());
+}
+
+void logTTFError(const char *msg) {
+    fprintf(stderr, "%s error: %s\n", msg, TTF_GetError());
+}
 // struct 
 
 //font크기 모음 구조체
@@ -19,15 +26,47 @@ typedef struct Fonts {
     TTF_Font* font60;
 } Fonts;
 
-typedef struct Button {
+typedef struct Box {
     SDL_Rect rect;
-    SDL_Color color;
+    SDL_Color background_color;
+    SDL_Texture* texture;
+} Box;
+typedef struct Button {
+    Box box;
     SDL_Color textColor;
     const char* text;
-    SDL_Texture* texture;
     TTF_Font* font;
 } Button;
 
+
+SDL_Texture* renderText(SDL_Renderer *renderer, TTF_Font *font, const char *text, SDL_Color color) {
+    SDL_Surface *surface = TTF_RenderText_Solid(font, text, color);
+    if (surface == NULL) {
+        logTTFError("TTF_RenderText_Solid");
+        return NULL;
+    }
+    SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, surface);
+    SDL_FreeSurface(surface);
+    if (texture == NULL) {
+        logSDLError("SDL_CreateTextureFromSurface");
+    }
+    return texture;
+}
+
+bool isMouseOverButton(Button button, int x, int y) {
+    return x >= button.box.rect.x && x <= button.box.rect.x + button.box.rect.w &&
+           y >= button.box.rect.y && y <= button.box.rect.y + button.box.rect.h;
+}
+
+void renderButton(SDL_Renderer *renderer, Button button) {
+    SDL_SetRenderDrawColor(renderer, button.box.background_color.r, button.box.background_color.g, button.box.background_color.b, button.box.background_color.a);
+    SDL_RenderFillRect(renderer, &button.box.rect);
+    int texW = 0;
+    int texH = 0;
+    SDL_QueryTexture(button.box.texture, NULL, NULL, &texW, &texH);
+    SDL_Rect dstRect = {button.box.rect.x + (button.box.rect.w - texW) / 2, button.box.rect.y + (button.box.rect.h - texH) / 2, texW, texH};
+    SDL_RenderCopy(renderer, button.box.texture, NULL, &dstRect);
+}
 //선수 데이터 구조체
 
 typedef struct Body {
@@ -337,36 +376,77 @@ void searchPlayer(Node* player_head, Node** search_head) {
     }
 }
 
-SDL_Texture* renderText(SDL_Renderer **renderer, TTF_Font **font, const char *text, SDL_Color color) {
-    SDL_Surface *surface = TTF_RenderText_Blended(*font, text, color);
-    SDL_Texture *texture = SDL_CreateTextureFromSurface(*renderer, surface);
-    SDL_FreeSurface(surface);
-    return texture;
+void startMain(SDL_Renderer* r, SDL_Event* e,TTF_Font* font) {
+    SDL_Color textColor = {255,255,255,255};
+    SDL_Color box_color = {255,255,255,255};
+    SDL_Color button_color = {200,100,150,255};
+    SDL_Color button_hover_color = {200,200,150,255};
+
+    Button titleBox = {{{490, 300, 300, 150},box_color,NULL},textColor,"Football Agency", font};
+    Button startButton = {{{550,500,100, 50},button_color,NULL}, textColor,"시작",font};
+
+    titleBox.box.texture = renderText(r,titleBox.font,titleBox.text,titleBox.textColor);
+    startButton.box.texture = renderText(r, startButton.font, startButton.text, startButton.textColor);
+
+    if(titleBox.box.texture == NULL || startButton.box.texture == NULL) {
+        SDL_DestroyTexture(titleBox.box.texture);   
+        SDL_DestroyTexture(startButton.box.texture);
+    }
+    bool quit = false;
+    while(!quit) {
+        while(SDL_PollEvent(e)) {
+            if (e->type == SDL_QUIT) {
+                quit = true;
+            }
+            else if (e->type == SDL_MOUSEBUTTONDOWN) {
+                int x, y;
+                SDL_GetMouseState(&x, &y);
+                if (isMouseOverButton(startButton, x, y)) {
+                    printf("start button clicked\n");
+                } 
+            }
+        }
+        int x, y;
+        SDL_GetMouseState(&x, &y);
+        if (isMouseOverButton(startButton, x, y)) {
+            startButton.box.background_color = button_hover_color;
+        } else {
+            startButton.box.background_color = button_color;
+        }
+        SDL_SetRenderDrawColor(r, 0,0,0,255);
+        SDL_RenderClear(r);
+        renderButton(r, titleBox);
+        renderButton(r, startButton);
+        SDL_RenderPresent(r);
+    }
 }
 
 int main() {
-    //SDL_Init(SDL_INIT_VIDEO);
-    SDL_Window* window;
-    SDL_Renderer* renderer;
-
     int w = 1280;
     int h = 800;
+    if (SDL_Init(SDL_INIT_VIDEO) != 0) {
+        logSDLError("SDL_Init");
+        return 1;
+    }
 
     if (TTF_Init() == -1) {
         return 0;
     }
-    TTF_Font* font = TTF_OpenFont("font/MangoDdobak.ttf", 30);
-
-    if (SDL_CreateWindowAndRenderer(w,h,0,&window,&renderer) < 0) {
-        printf("SDL_CreateWindowAndRenderer Error\n");
-        return 0;
+    SDL_Window* window= SDL_CreateWindow("SDL2 Buttons", 10, 10, w, h, SDL_WINDOW_SHOWN);;
+    if (window == NULL) {
+        logSDLError("SDL_CreateWindow");
+        TTF_Quit();
+        SDL_Quit();
+        return 1;
     }
-
-    Node* player_head = NULL;
-    Node* search_head = NULL;
-    readCSV("FM2023.csv", &player_head);
-    searchPlayer(player_head, &search_head);
-    printList(search_head);
+    SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);;
+    if (renderer == NULL) {
+        logSDLError("SDL_CreateRenderer");
+        SDL_DestroyWindow(window);
+        TTF_Quit();
+        SDL_Quit();
+        return 1;
+    }
 
     Fonts font_collection = {
         TTF_OpenFont("font/MangoDdobak.ttf",10),
@@ -376,8 +456,47 @@ int main() {
         TTF_OpenFont("font/MangoDdobak.ttf",50),
         TTF_OpenFont("font/MangoDdobak.ttf",60)
     };
+    if (font_collection.font10 == NULL || font_collection.font20 == NULL || font_collection.font30 == NULL || \
+        font_collection.font40 == NULL || font_collection.font50 == NULL || font_collection.font60 == NULL) {
+        logTTFError("TTF_OpenFont error");
+        TTF_CloseFont(font_collection.font10);
+        TTF_CloseFont(font_collection.font20);
+        TTF_CloseFont(font_collection.font30);
+        TTF_CloseFont(font_collection.font40);
+        TTF_CloseFont(font_collection.font50);
+        TTF_CloseFont(font_collection.font60);
+        SDL_DestroyRenderer(renderer);
+        SDL_DestroyWindow(window);
+        TTF_Quit();
+        SDL_Quit();
+        return 1;
+    }
+    //Node 
+    Node* player_head = NULL;
+    Node* search_head = NULL;
+    readCSV("FM2023.csv", &player_head);
+    searchPlayer(player_head, &search_head);
+    printList(search_head);
+    //
 
     SDL_Color textColor = {0,0,0};
+    SDL_Color buttonColor = {0, 0, 255, 255};
+    SDL_Color buttonColorHover = {0, 0, 200, 255};
+
+    Button prevButton = {{{50, 400, 150, 50}, buttonColor,NULL}, textColor, "Previous", font_collection.font20};
+    Button nextButton = {{{700, 400, 150, 50}, buttonColor,NULL}, textColor, "Next", font_collection.font20};
+    
+    prevButton.box.texture = renderText(renderer, prevButton.font, prevButton.text, textColor);
+    nextButton.box.texture = renderText(renderer, nextButton.font, nextButton.text, textColor);
+    if (prevButton.box.texture == NULL || nextButton.box.texture == NULL) {
+        SDL_DestroyTexture(prevButton.box.texture);
+        SDL_DestroyTexture(nextButton.box.texture);
+        SDL_DestroyRenderer(renderer);
+        SDL_DestroyWindow(window);
+        TTF_Quit();
+        SDL_Quit();
+        return 1;
+    }
 
     SDL_Texture* tp_texture;
     SDL_Surface* tp_surface;
@@ -398,21 +517,48 @@ int main() {
     bool running = true;
 
     while (running) {
-        SDL_Event event;
-        while(SDL_PollEvent(&event)) {
-            if (event.type == SDL_KEYDOWN) {
-                if (event.key.keysym.sym == SDLK_ESCAPE) {
+        SDL_Event e;
+        while(SDL_PollEvent(&e)) {
+            if (e.type == SDL_KEYDOWN) {
+                if (e.key.keysym.sym == SDLK_ESCAPE) {
                     running = false;
                 }
             }
-            else if (event.type == SDL_QUIT) {
+            else if (e.type == SDL_QUIT) {
                 running = false;
             }
+            else if (e.type == SDL_MOUSEBUTTONDOWN) {
+                int x, y;
+                SDL_GetMouseState(&x, &y);
+                if (isMouseOverButton(prevButton, x, y)) {
+                    printf("Previous button clicked\n");
+                } else if (isMouseOverButton(nextButton, x, y)) {
+                    printf("Next button clicked\n");
+                }
+            }
         }
-        SDL_RenderClear(renderer);
+        int x, y;
+        SDL_GetMouseState(&x, &y);
+        if (isMouseOverButton(prevButton, x, y)) {
+            prevButton.box.background_color = buttonColorHover;
+        } else {
+            prevButton.box.background_color = buttonColor;
+        }
+
+        if (isMouseOverButton(nextButton, x, y)) {
+            nextButton.box.background_color = buttonColorHover;
+        } else {
+            nextButton.box.background_color = buttonColor;
+        }
+
+        
         SDL_SetRenderDrawColor(renderer, 255,255,255,255);
+        SDL_RenderClear(renderer);
 
         SDL_RenderCopy(renderer, tp_texture,NULL, &renderQuad);
+        renderButton(renderer, prevButton);
+        renderButton(renderer, nextButton);
+
         SDL_RenderPresent(renderer);
     }
     
