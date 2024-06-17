@@ -1,70 +1,179 @@
-#include <stdio.h>
-#include <stdbool.h>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
+#include <stdio.h>
+#include <stdbool.h>
 
+void logSDLError(const char *msg) {
+    fprintf(stderr, "%s error: %s\n", msg, SDL_GetError());
+}
 
-int main(int argc, char** argv)
-{
-    SDL_Window* pWindow;
-    SDL_Renderer* pRenderer;
-    TTF_Font* pFont;
+void logTTFError(const char *msg) {
+    fprintf(stderr, "%s error: %s\n", msg, TTF_GetError());
+}
 
-    int width = 640;
-    int height = 480;
+typedef struct {
+    TTF_Font* font24;
+    TTF_Font* font48;
+} Fonts;
 
-    if (TTF_Init() == -1)
-    {
-        return 0;
+typedef struct {
+    SDL_Rect rect;
+    SDL_Color color;
+    SDL_Color textColor;
+    const char* text;
+    SDL_Texture* texture;
+    TTF_Font* font;
+} Button;
+
+SDL_Texture* renderText(SDL_Renderer *renderer, TTF_Font *font, const char *text, SDL_Color color) {
+    SDL_Surface *surface = TTF_RenderText_Solid(font, text, color);
+    if (surface == NULL) {
+        logTTFError("TTF_RenderText_Solid");
+        return NULL;
+    }
+    SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, surface);
+    SDL_FreeSurface(surface);
+    if (texture == NULL) {
+        logSDLError("SDL_CreateTextureFromSurface");
+    }
+    return texture;
+}
+
+bool isMouseOverButton(Button button, int x, int y) {
+    return x >= button.rect.x && x <= button.rect.x + button.rect.w &&
+           y >= button.rect.y && y <= button.rect.y + button.rect.h;
+}
+
+void renderButton(SDL_Renderer *renderer, Button button) {
+    SDL_SetRenderDrawColor(renderer, button.color.r, button.color.g, button.color.b, button.color.a);
+    SDL_RenderFillRect(renderer, &button.rect);
+    int texW = 0;
+    int texH = 0;
+    SDL_QueryTexture(button.texture, NULL, NULL, &texW, &texH);
+    SDL_Rect dstRect = {button.rect.x + (button.rect.w - texW) / 2, button.rect.y + (button.rect.h - texH) / 2, texW, texH};
+    SDL_RenderCopy(renderer, button.texture, NULL, &dstRect);
+}
+
+int main(int argc, char* argv[]) {
+    if (SDL_Init(SDL_INIT_VIDEO) != 0) {
+        logSDLError("SDL_Init");
+        return 1;
     }
 
-    if (SDL_CreateWindowAndRenderer(width, height, 0, &pWindow, &pRenderer) < 0)
-    {
-        printf("SDL_CreateWindowAndRenderer Error\n");
-        return 0;
+    if (TTF_Init() == -1) {
+        logTTFError("TTF_Init");
+        SDL_Quit();
+        return 1;
     }
 
-    SDL_Texture* screenTexture = SDL_CreateTexture(pRenderer, SDL_PIXELFORMAT_RGBA32, SDL_TEXTUREACCESS_STREAMING, width, height);
+    SDL_Window *window = SDL_CreateWindow("SDL2 Buttons", 100, 100, 640, 480, SDL_WINDOW_SHOWN);
+    if (window == NULL) {
+        logSDLError("SDL_CreateWindow");
+        TTF_Quit();
+        SDL_Quit();
+        return 1;
+    }
 
-    pFont = TTF_OpenFont("font/MangoDdobak.ttf", 30);
+    SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+    if (renderer == NULL) {
+        logSDLError("SDL_CreateRenderer");
+        SDL_DestroyWindow(window);
+        TTF_Quit();
+        SDL_Quit();
+        return 1;
+    }
 
-    SDL_Color textColor = { 0, 0, 0 };
-    SDL_Surface* textSurface = TTF_RenderText_Blended(pFont, "TTF Test", textColor);
-    SDL_Texture* mTexture = SDL_CreateTextureFromSurface(pRenderer, textSurface);
+    Fonts fonts;
+    fonts.font24 = TTF_OpenFont("font/MangoDdobak.ttf", 24);
+    if (fonts.font24 == NULL) {
+        logTTFError("TTF_OpenFont (24)");
+        SDL_DestroyRenderer(renderer);
+        SDL_DestroyWindow(window);
+        TTF_Quit();
+        SDL_Quit();
+        return 1;
+    }
 
-    int mWidth = textSurface->w;
-    int mHeight = textSurface->h;
+    fonts.font48 = TTF_OpenFont("/path/to/font.ttf", 48);
+    if (fonts.font48 == NULL) {
+        logTTFError("TTF_OpenFont (48)");
+        TTF_CloseFont(fonts.font24);
+        SDL_DestroyRenderer(renderer);
+        SDL_DestroyWindow(window);
+        TTF_Quit();
+        SDL_Quit();
+        return 1;
+    }
 
-    // render text
-    SDL_Rect renderQuad = { 10, 10, mWidth, mHeight };
+    SDL_Color textColor = {255, 255, 255, 255};
+    SDL_Color buttonColor = {0, 0, 255, 255};
+    SDL_Color buttonColorHover = {0, 0, 200, 255};
 
+    Button prevButton = {{50, 400, 150, 50}, buttonColor, textColor, "Previous", NULL, fonts.font24};
+    Button nextButton = {{440, 400, 150, 50}, buttonColor, textColor, "Next", NULL, fonts.font48};
 
-    bool running = true;
+    prevButton.texture = renderText(renderer, prevButton.font, prevButton.text, textColor);
+    nextButton.texture = renderText(renderer, nextButton.font, nextButton.text, textColor);
 
-    int lastTickCount = SDL_GetTicks();
-    int curTickCount = SDL_GetTicks();
-    int k = 0;
-    while (running) {
-        SDL_Event event;
-        while (SDL_PollEvent(&event)) {
-            if (event.type == SDL_KEYDOWN) {
-                if (event.key.keysym.sym == SDLK_ESCAPE)
-                    running = false;            
+    if (prevButton.texture == NULL || nextButton.texture == NULL) {
+        SDL_DestroyTexture(prevButton.texture);
+        SDL_DestroyTexture(nextButton.texture);
+        TTF_CloseFont(fonts.font24);
+        TTF_CloseFont(fonts.font48);
+        SDL_DestroyRenderer(renderer);
+        SDL_DestroyWindow(window);
+        TTF_Quit();
+        SDL_Quit();
+        return 1;
+    }
+
+    SDL_Event e;
+    bool quit = false;
+    while (!quit) {
+        while (SDL_PollEvent(&e)) {
+            if (e.type == SDL_QUIT) {
+                quit = true;
+            } else if (e.type == SDL_MOUSEBUTTONDOWN) {
+                int x, y;
+                SDL_GetMouseState(&x, &y);
+                if (isMouseOverButton(prevButton, x, y)) {
+                    printf("Previous button clicked\n");
+                } else if (isMouseOverButton(nextButton, x, y)) {
+                    printf("Next button clicked\n");
+                }
             }
-            else if (event.type == SDL_QUIT)
-                running = false;
         }
 
-        SDL_RenderClear(pRenderer);
-        SDL_SetRenderDrawColor(pRenderer, 255, 255, 255, 255);
+        int x, y;
+        SDL_GetMouseState(&x, &y);
+        if (isMouseOverButton(prevButton, x, y)) {
+            prevButton.color = buttonColorHover;
+        } else {
+            prevButton.color = buttonColor;
+        }
 
-        SDL_RenderCopy(pRenderer, mTexture, NULL, &renderQuad);
-        SDL_RenderPresent(pRenderer);
+        if (isMouseOverButton(nextButton, x, y)) {
+            nextButton.color = buttonColorHover;
+        } else {
+            nextButton.color = buttonColor;
+        }
+
+        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+        SDL_RenderClear(renderer);
+
+        renderButton(renderer, prevButton);
+        renderButton(renderer, nextButton);
+
+        SDL_RenderPresent(renderer);
     }
 
-    TTF_CloseFont(pFont);
-    SDL_DestroyRenderer(pRenderer);
-    SDL_DestroyWindow(pWindow);
+    SDL_DestroyTexture(prevButton.texture);
+    SDL_DestroyTexture(nextButton.texture);
+    TTF_CloseFont(fonts.font24);
+    TTF_CloseFont(fonts.font48);
+    SDL_DestroyRenderer(renderer);
+    SDL_DestroyWindow(window);
+    TTF_Quit();
     SDL_Quit();
 
     return 0;

@@ -10,7 +10,7 @@
 // struct 
 
 //font크기 모음 구조체
-typedef struct {
+typedef struct Fonts {
     TTF_Font* font10;
     TTF_Font* font20;
     TTF_Font* font30;
@@ -19,7 +19,7 @@ typedef struct {
     TTF_Font* font60;
 } Fonts;
 
-typedef struct {
+typedef struct Button {
     SDL_Rect rect;
     SDL_Color color;
     SDL_Color textColor;
@@ -29,18 +29,19 @@ typedef struct {
 } Button;
 
 //선수 데이터 구조체
-typedef struct {
+
+typedef struct Body {
     int height;
     int weight;
 } Body;
 
-typedef struct 
+typedef struct Foot_ability
 {
     int left;
     int right;
 } Foot_ability;
 
-typedef struct {
+typedef struct Ability_stat{
     int corners;            int crossing;       int dribbling;          int finishing;              int first_touch;
     int free_kick_taking;   int heading;        int long_shot;          int long_throws;            int marking;
     int passing;            int penalty_taking; int tackling;           int technique;              int aggressiion;
@@ -55,7 +56,7 @@ typedef struct {
     int professional;       int sportmanship;   int emotional_control;  int punching;               int resistant_to_stress;
 } Ability_stat;
 
-typedef struct {
+typedef struct Position_stat {
     //GK
     int GK;
     //Defender
@@ -66,7 +67,7 @@ typedef struct {
     int AML; int AMC; int AMR; int ST;
 } Position_stat;
 
-typedef struct {
+typedef struct Player {
     char name[100];
     char position[100];
     int age;
@@ -344,6 +345,7 @@ SDL_Texture* renderText(SDL_Renderer **renderer, TTF_Font **font, const char *te
 }
 
 int main() {
+    //SDL_Init(SDL_INIT_VIDEO);
     SDL_Window* window;
     SDL_Renderer* renderer;
 
