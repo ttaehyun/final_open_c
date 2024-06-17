@@ -2,31 +2,10 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_ttf.h>
 
 #define MAX_LINE_LENGTH 1024
 
 // struct 
-
-//font크기 모음 구조체
-typedef struct {
-    TTF_Font* font10;
-    TTF_Font* font20;
-    TTF_Font* font30;
-    TTF_Font* font40;
-    TTF_Font* font50;
-    TTF_Font* font60;
-} Fonts;
-
-typedef struct {
-    SDL_Rect rect;
-    SDL_Color color;
-    SDL_Color textColor;
-    const char* text;
-    SDL_Texture* texture;
-    TTF_Font* font;
-} Button;
 
 //선수 데이터 구조체
 typedef struct {
@@ -336,93 +315,17 @@ void searchPlayer(Node* player_head, Node** search_head) {
     }
 }
 
-SDL_Texture* renderText(SDL_Renderer **renderer, TTF_Font **font, const char *text, SDL_Color color) {
-    SDL_Surface *surface = TTF_RenderText_Blended(*font, text, color);
-    SDL_Texture *texture = SDL_CreateTextureFromSurface(*renderer, surface);
-    SDL_FreeSurface(surface);
-    return texture;
-}
-
 int main() {
-    SDL_Window* window;
-    SDL_Renderer* renderer;
-
-    int w = 1280;
-    int h = 800;
-
-    if (TTF_Init() == -1) {
-        return 0;
-    }
-    TTF_Font* font = TTF_OpenFont("font/MangoDdobak.ttf", 30);
-
-    if (SDL_CreateWindowAndRenderer(w,h,0,&window,&renderer) < 0) {
-        printf("SDL_CreateWindowAndRenderer Error\n");
-        return 0;
-    }
+    
 
     Node* player_head = NULL;
     Node* search_head = NULL;
     readCSV("FM2023.csv", &player_head);
+
     searchPlayer(player_head, &search_head);
+
     printList(search_head);
 
-    Fonts font_collection = {
-        TTF_OpenFont("font/MangoDdobak.ttf",10),
-        TTF_OpenFont("font/MangoDdobak.ttf",20),
-        TTF_OpenFont("font/MangoDdobak.ttf",30),
-        TTF_OpenFont("font/MangoDdobak.ttf",40),
-        TTF_OpenFont("font/MangoDdobak.ttf",50),
-        TTF_OpenFont("font/MangoDdobak.ttf",60)
-    };
 
-    SDL_Color textColor = {0,0,0};
-
-    SDL_Texture* tp_texture;
-    SDL_Surface* tp_surface;
-
-
-    //Node* temp = search_head;
-    if (search_head == NULL) {
-        printf("empty");
-    }
-    while(search_head!=NULL) {
-        tp_surface = TTF_RenderText_Blended(font_collection.font50,search_head->player.name,textColor);
-        //tp_texture = renderText(&renderer, &font,search_head->player.name, textColor);
-        tp_texture = SDL_CreateTextureFromSurface(renderer, tp_surface);
-        search_head = search_head->next;
-    }
-    SDL_Rect renderQuad = {10,10,tp_surface->w, tp_surface->h };
-
-    bool running = true;
-
-    while (running) {
-        SDL_Event event;
-        while(SDL_PollEvent(&event)) {
-            if (event.type == SDL_KEYDOWN) {
-                if (event.key.keysym.sym == SDLK_ESCAPE) {
-                    running = false;
-                }
-            }
-            else if (event.type == SDL_QUIT) {
-                running = false;
-            }
-        }
-        SDL_RenderClear(renderer);
-        SDL_SetRenderDrawColor(renderer, 255,255,255,255);
-
-        SDL_RenderCopy(renderer, tp_texture,NULL, &renderQuad);
-        SDL_RenderPresent(renderer);
-    }
-    
-    TTF_CloseFont(font_collection.font10);
-    TTF_CloseFont(font_collection.font20);
-    TTF_CloseFont(font_collection.font30);
-    TTF_CloseFont(font_collection.font40);
-    TTF_CloseFont(font_collection.font50);
-    TTF_CloseFont(font_collection.font60);
-
-    SDL_DestroyRenderer(renderer);
-    SDL_DestroyWindow(window);
-    SDL_Quit();
     return 0;
 }
