@@ -137,6 +137,13 @@ typedef struct Node {
     struct Node* next;
 } Node;
 
+typedef struct Circularlist {
+    Node* head;
+} Circularlist;
+
+void initList(Circularlist* list) {
+    list->head = NULL;
+}
 Node* createNode(Player player) {
     Node* newNode = (Node*)malloc(sizeof(Node));
     newNode->player = player;
@@ -144,67 +151,35 @@ Node* createNode(Player player) {
     return newNode;
 }
 
-void appendNode(Node** head, Player player) {
+void appendNode(Circularlist* list, Player player) {
     Node* newNode = createNode(player);
-    if (*head == NULL) {
-        *head = newNode;
-        return;
-    }
-    Node* temp = *head;
-    while (temp->next != NULL) {
-        temp = temp->next;
-    }
-
-    temp->next = newNode;
-    newNode->prev = temp;
-    
-}
-
-//특정 UID를 가진 노드 삭제
-void deleteNode(Node** head, int UID) {
-    Node* temp = *head;
-
-    while(temp != NULL && temp->player.UID != UID) {
-        temp = temp->next;
-    }
-
-    if (temp == NULL) return;
-
-    if (temp->next != NULL) {
-        //임시에 다음 것이 있다면 다음 노드의 이전 노드 주소를 지금 노드의 이전과 같게 해줘야함
-        temp->next->prev = temp->prev;
-    }
-    if (temp->prev != NULL) {
-        temp->prev->next = temp->next;
+    if (list->head == NULL) {
+        list->head = newNode;
+        list->head->next = list->head;
+        list->head->prev = list->head;
     }
     else {
-        *head = temp->next;
-    }
-    free(temp);
-}
-
-void printList(Node* head) {
-    Node* temp = head;
-    if (temp == NULL) {
-        printf("empty");
-    }
-    while(temp!=NULL) {
-        printf("Name: %s, Position: %s, Age: %d, UID: %d\n", temp->player.name, temp->player.position, temp->player.age, temp->player.UID);
-        temp = temp->next;
+        Node* tail = list->head->prev;
+        tail->next = newNode;
+        newNode->prev = tail;
+        newNode->next = list->head;
+        list->head->prev = newNode;
     }
 }
 
-int countNodes(Node* head) {
-    int count = 0;
-    Node* temp = head;
-    while(temp!= NULL) {
-        count++;
-        temp = temp->next;
+void printList(Circularlist* list) {
+    if (list->head == NULL) {
+        printf("List is empty\n");
+        return;
     }
-    return count;
+    Node* current = list->head;
+    do {
+        printf("Name: %s, Position: %s, Age: %d, UID: %d\n", current->player.name, current->player.position, current->player.age, current->player.UID);
+        current = current->next;
+    } while (current != list->head);
 }
 
-void readCSV(const char* filename, Node** node) {
+void readCSV(const char* filename, Circularlist* list) {
     FILE* file = fopen(filename, "r");
     if (file == NULL) {
         perror("Unable to open file");
@@ -360,30 +335,33 @@ void readCSV(const char* filename, Node** node) {
         token = strtok(NULL, ",");
         if (token != NULL) player.UID = atoi(token);
 
-        appendNode(node, player);
+        appendNode(list, player);
     }
     fclose(file);
 }
 
-void searchPlayer(Node* player_head, Node** search_head) {
-    Node* temp = player_head;
-    while(temp!= NULL) {
-        if (temp->player.pa > 170 && temp->player.ca <150 && temp->player.age < 20) {
-            //printf("Name: %s Position: %s Age: %d pa: %d\n", temp->player.name, temp->player.position, temp->player.age, temp->player.pa);
-            appendNode(search_head,temp->player);
-        }
-        temp = temp->next;
+void searchPlayer(Circularlist* player_list, Circularlist* search_list) {
+    if (player_list->head == NULL) {
+        printf("List is empty\n");
+        return;
     }
+    Node* current = player_list->head;
+    do {
+        if (current->player.pa > 170 && current->player.ca <150 && current->player.age < 20) {
+            appendNode(search_list,current->player);
+        }
+        current = current->next;
+    } while (current != player_list->head);
 }
 
-void startMain(SDL_Renderer* r, SDL_Event* e,TTF_Font* font) {
-    SDL_Color textColor = {255,255,255,255};
+void startMain(SDL_Renderer* r, SDL_Event* e,Fonts* fonts) {
+    SDL_Color textColor = {0,0,0,255};
     SDL_Color box_color = {255,255,255,255};
     SDL_Color button_color = {200,100,150,255};
     SDL_Color button_hover_color = {200,200,150,255};
 
-    Button titleBox = {{{490, 300, 300, 150},box_color,NULL},textColor,"Football Agency", font};
-    Button startButton = {{{550,500,100, 50},button_color,NULL}, textColor,"시작",font};
+    Button titleBox = {{{490, 300, 300, 150},box_color,NULL},textColor,"Football Agency", fonts->font60};
+    Button startButton = {{{550,500,200, 50},button_color,NULL}, textColor,"Start",fonts->font40};
 
     titleBox.box.texture = renderText(r,titleBox.font,titleBox.text,titleBox.textColor);
     startButton.box.texture = renderText(r, startButton.font, startButton.text, startButton.textColor);
@@ -395,7 +373,12 @@ void startMain(SDL_Renderer* r, SDL_Event* e,TTF_Font* font) {
     bool quit = false;
     while(!quit) {
         while(SDL_PollEvent(e)) {
-            if (e->type == SDL_QUIT) {
+            if (e->type == SDL_KEYDOWN) {
+                if (e->key.keysym.sym == SDLK_ESCAPE) {
+                    quit = true;
+                }
+            }
+            else if (e->type == SDL_QUIT) {
                 quit = true;
             }
             else if (e->type == SDL_MOUSEBUTTONDOWN) {
@@ -403,6 +386,7 @@ void startMain(SDL_Renderer* r, SDL_Event* e,TTF_Font* font) {
                 SDL_GetMouseState(&x, &y);
                 if (isMouseOverButton(startButton, x, y)) {
                     printf("start button clicked\n");
+                    quit = true;
                 } 
             }
         }
@@ -413,14 +397,214 @@ void startMain(SDL_Renderer* r, SDL_Event* e,TTF_Font* font) {
         } else {
             startButton.box.background_color = button_color;
         }
-        SDL_SetRenderDrawColor(r, 0,0,0,255);
+        SDL_SetRenderDrawColor(r, 255,255,255,255);
         SDL_RenderClear(r);
         renderButton(r, titleBox);
         renderButton(r, startButton);
         SDL_RenderPresent(r);
     }
+    SDL_DestroyTexture(titleBox.box.texture);   
+    SDL_DestroyTexture(startButton.box.texture);
 }
 
+void where_position_recommended_screen(SDL_Renderer* r, SDL_Event* e, Fonts* fonts) {
+    SDL_Color textColor = {0,0,0,255};
+    SDL_Color box_color = {255,255,255,255};
+    SDL_Color button_color = {200,100,150,255};
+    SDL_Color button_hover_color = {200,200,150,255};
+
+    Button attackerButton = {{{500,100, 300,100},box_color,NULL},textColor,"Attacker",fonts->font40};
+    Button midfielderButton = {{{500,250,300,100},box_color,NULL},textColor,"Midfielder",fonts->font40};
+    Button defenderButton = {{{500,400,300,100},box_color,NULL},textColor,"Defender",fonts->font40};
+    Button goalkeeperButton = {{{500,550,300,100},box_color,NULL},textColor,"GoalKeeper",fonts->font40};
+
+    attackerButton.box.texture = renderText(r,attackerButton.font,attackerButton.text,attackerButton.textColor);
+    midfielderButton.box.texture = renderText(r,midfielderButton.font,midfielderButton.text,midfielderButton.textColor);
+    defenderButton.box.texture = renderText(r,defenderButton.font,defenderButton.text,defenderButton.textColor);
+    goalkeeperButton.box.texture = renderText(r,goalkeeperButton.font,goalkeeperButton.text,goalkeeperButton.textColor);
+
+    if(attackerButton.box.texture == NULL || midfielderButton.box.texture == NULL || \
+        defenderButton.box.texture == NULL || goalkeeperButton.box.texture == NULL) {
+        SDL_DestroyTexture(attackerButton.box.texture);   
+        SDL_DestroyTexture(midfielderButton.box.texture);
+        SDL_DestroyTexture(defenderButton.box.texture);
+        SDL_DestroyTexture(goalkeeperButton.box.texture);
+    }
+    bool quit = false;
+    while(!quit) {
+        while(SDL_PollEvent(e)) {
+            if (e->type == SDL_KEYDOWN) {
+                if (e->key.keysym.sym == SDLK_ESCAPE) {
+                    quit = true;
+                }
+            }
+            else if (e->type == SDL_QUIT) {
+                quit = true;
+            }
+            else if (e->type == SDL_MOUSEBUTTONDOWN) {
+                int x, y;
+                SDL_GetMouseState(&x, &y);
+                if (isMouseOverButton(attackerButton, x, y)) {
+                    printf("attacker button clicked\n");
+                    quit = true;
+                }
+                else if (isMouseOverButton(midfielderButton,x,y)) {
+                    printf("mid button");
+                } 
+                else if (isMouseOverButton(defenderButton,x,y)) {
+                    printf("defend button");
+                }
+                else if (isMouseOverButton(goalkeeperButton, x, y)) {
+                    printf("goal button");
+                }
+            }
+        }
+        int x, y;
+        SDL_GetMouseState(&x, &y);
+        if (isMouseOverButton(attackerButton, x, y)) {
+            attackerButton.box.background_color = button_hover_color;
+        } else {
+            attackerButton.box.background_color = button_color;
+        }
+        if (isMouseOverButton(midfielderButton, x, y)) {
+            midfielderButton.box.background_color = button_hover_color;
+        } else {
+            midfielderButton.box.background_color = button_color;
+        }
+        if (isMouseOverButton(defenderButton, x, y)) {
+            defenderButton.box.background_color = button_hover_color;
+        } else {
+            defenderButton.box.background_color = button_color;
+        }
+        if (isMouseOverButton(goalkeeperButton, x, y)) {
+            goalkeeperButton.box.background_color = button_hover_color;
+        } else {
+            goalkeeperButton.box.background_color = button_color;
+        }
+        SDL_SetRenderDrawColor(r, 255,255,255,255);
+        SDL_RenderClear(r);
+        renderButton(r, attackerButton);
+        renderButton(r, midfielderButton);
+        renderButton(r, defenderButton);
+        renderButton(r, goalkeeperButton);
+        SDL_RenderPresent(r);
+    }
+    SDL_DestroyTexture(attackerButton.box.texture);   
+    SDL_DestroyTexture(midfielderButton.box.texture);
+    SDL_DestroyTexture(defenderButton.box.texture);
+    SDL_DestroyTexture(goalkeeperButton.box.texture);
+}
+
+void player_data_screen(SDL_Renderer* r, SDL_Event* e, Fonts* fonts, Circularlist* list) {
+    Node* current = list->head;
+
+    SDL_Color textColor = {0,0,0,255};
+    SDL_Color box_color = {255,255,255,0};
+    SDL_Color button_color = {200,100,150,255};
+    SDL_Color button_hover_color = {200,200,150,255};
+    char buffer[12];
+    snprintf(buffer, sizeof(buffer), "%d", current->player.age);
+    int name_x = 10;
+    int name_y = 10;
+    Button nameBox = {{{name_x,name_y,50,20},box_color,NULL}, textColor, "Name:",fonts->font20}; 
+    Button name = {{{name_x+130,name_y,100,20},box_color,NULL}, textColor, current->player.name,fonts->font20};
+    Button birthBox = {{{name_x+300,name_y,100,20},box_color,NULL}, textColor, "Birth:",fonts->font20};
+    Button birth = {{{name_x+ 400,name_y,100,20},box_color,NULL}, textColor, current->player.birth,fonts->font20};
+    Button ageBox = {{{name_x+500,name_y,100,20},box_color,NULL}, textColor, "Age:",fonts->font20};
+    Button age = {{{name_x+600,name_y,50,20},box_color,NULL}, textColor, buffer,fonts->font20};
+    Button nationBox = {{{name_x+700,name_y,100,20},box_color,NULL}, textColor, "Nation:",fonts->font20};
+    Button nation = {{{name_x+800,name_y,100,20},box_color,NULL}, textColor, current->player.nationality,fonts->font20};
+
+    Button prevButton = {{{50, 400, 150, 50}, box_color,NULL}, textColor, "Previous", fonts->font20};
+    Button nextButton = {{{1000, 400, 150, 50}, box_color,NULL}, textColor, "Next", fonts->font20};
+
+    nameBox.box.texture = renderText(r, nameBox.font,nameBox.text,nameBox.textColor);
+    name.box.texture = renderText(r,name.font,name.text,name.textColor);
+    birthBox.box.texture = renderText(r,birthBox.font, birthBox.text,birthBox.textColor);
+    birth.box.texture = renderText(r,birth.font,birth.text,name.textColor);
+    ageBox.box.texture = renderText(r, ageBox.font, ageBox.text, ageBox.textColor);
+    age.box.texture = renderText(r,age.font,age.text,age.textColor);
+    nationBox.box.texture = renderText(r, nationBox.font, nationBox.text, nationBox.textColor);
+    nation.box.texture = renderText(r,nation.font,nation.text,nation.textColor);
+
+    prevButton.box.texture = renderText(r,prevButton.font,prevButton.text,prevButton.textColor);
+    nextButton.box.texture = renderText(r, nextButton.font, nextButton.text,nextButton.textColor);
+
+    bool quit = false;
+    while(!quit) {
+        while(SDL_PollEvent(e)) {
+            if (e->type == SDL_KEYDOWN) {
+                if (e->key.keysym.sym == SDLK_ESCAPE) {
+                    quit = true;
+                }
+            }
+            else if (e->type == SDL_QUIT) {
+                quit = true;
+            }
+            else if (e->type == SDL_MOUSEBUTTONDOWN) {
+                int x, y;
+                SDL_GetMouseState(&x, &y);
+                if (isMouseOverButton(prevButton, x, y)) {
+                    printf("prev button clicked\n");
+                    current = current->prev;
+                    name.text = current->player.name;
+                    name.box.texture = renderText(r, name.font,name.text,name.textColor);
+                    birth.text = current->player.birth;
+                    birth.box.texture = renderText(r, birth.font,birth.text,birth.textColor);
+                    snprintf(buffer, sizeof(buffer), "%d", current->player.age);
+                    age.text = buffer;
+                    age.box.texture = renderText(r, age.font,age.text,age.textColor);
+                    nation.text = current->player.nationality;
+                    nation.box.texture = renderText(r,nation.font,nation.text,nation.textColor);
+                }
+                else if (isMouseOverButton(nextButton,x,y)) {
+                    printf("next button");
+                    current = current->next;
+                    name.text = current->player.name;
+                    name.box.texture = renderText(r, name.font,name.text,name.textColor);
+                    birth.text = current->player.birth;
+                    birth.box.texture = renderText(r, birth.font,birth.text,birth.textColor);
+                    snprintf(buffer, sizeof(buffer), "%d", current->player.age);
+                    age.text = buffer;
+                    age.box.texture = renderText(r, age.font,age.text,age.textColor);
+                    nation.text = current->player.nationality;
+                    nation.box.texture = renderText(r,nation.font,nation.text,nation.textColor);
+                } 
+            }
+        }
+        
+        int x, y;
+        SDL_GetMouseState(&x, &y);
+        if (isMouseOverButton(prevButton, x, y)) {
+            prevButton.box.background_color = button_hover_color;
+        } else {
+            prevButton.box.background_color = button_color;
+        }
+        if (isMouseOverButton(nextButton, x, y)) {
+            nextButton.box.background_color = button_hover_color;
+        } else {
+            nextButton.box.background_color = button_color;
+        }
+        SDL_SetRenderDrawColor(r, 255,255,255,255);
+        SDL_RenderClear(r);
+        renderButton(r, nameBox);
+        renderButton(r, name);
+        renderButton(r, birthBox);
+        renderButton(r, birth);
+        renderButton(r, ageBox);
+        renderButton(r, age);
+        renderButton(r, nationBox);
+        renderButton(r, nation);  
+        renderButton(r, prevButton);
+        renderButton(r,nextButton);
+
+        SDL_RenderPresent(r);
+    }
+    SDL_DestroyTexture(name.box.texture);
+    SDL_DestroyTexture(birth.box.texture);
+    SDL_DestroyTexture(age.box.texture);
+    SDL_DestroyTexture(nation.box.texture);
+}
 int main() {
     int w = 1280;
     int h = 800;
@@ -472,95 +656,20 @@ int main() {
         return 1;
     }
     //Node 
-    Node* player_head = NULL;
-    Node* search_head = NULL;
-    readCSV("FM2023.csv", &player_head);
-    searchPlayer(player_head, &search_head);
-    printList(search_head);
-    //
+    Circularlist player_list;
+    Circularlist search_list;
+    initList(&player_list);
+    initList(&search_list);
 
-    SDL_Color textColor = {0,0,0};
-    SDL_Color buttonColor = {0, 0, 255, 255};
-    SDL_Color buttonColorHover = {0, 0, 200, 255};
-
-    Button prevButton = {{{50, 400, 150, 50}, buttonColor,NULL}, textColor, "Previous", font_collection.font20};
-    Button nextButton = {{{700, 400, 150, 50}, buttonColor,NULL}, textColor, "Next", font_collection.font20};
+    readCSV("FM2023.csv", &player_list);
+    searchPlayer(&player_list, &search_list);
+    printList(&search_list);
     
-    prevButton.box.texture = renderText(renderer, prevButton.font, prevButton.text, textColor);
-    nextButton.box.texture = renderText(renderer, nextButton.font, nextButton.text, textColor);
-    if (prevButton.box.texture == NULL || nextButton.box.texture == NULL) {
-        SDL_DestroyTexture(prevButton.box.texture);
-        SDL_DestroyTexture(nextButton.box.texture);
-        SDL_DestroyRenderer(renderer);
-        SDL_DestroyWindow(window);
-        TTF_Quit();
-        SDL_Quit();
-        return 1;
-    }
 
-    SDL_Texture* tp_texture;
-    SDL_Surface* tp_surface;
-
-
-    //Node* temp = search_head;
-    if (search_head == NULL) {
-        printf("empty");
-    }
-    while(search_head!=NULL) {
-        tp_surface = TTF_RenderText_Blended(font_collection.font50,search_head->player.name,textColor);
-        //tp_texture = renderText(&renderer, &font,search_head->player.name, textColor);
-        tp_texture = SDL_CreateTextureFromSurface(renderer, tp_surface);
-        search_head = search_head->next;
-    }
-    SDL_Rect renderQuad = {10,10,tp_surface->w, tp_surface->h };
-
-    bool running = true;
-
-    while (running) {
-        SDL_Event e;
-        while(SDL_PollEvent(&e)) {
-            if (e.type == SDL_KEYDOWN) {
-                if (e.key.keysym.sym == SDLK_ESCAPE) {
-                    running = false;
-                }
-            }
-            else if (e.type == SDL_QUIT) {
-                running = false;
-            }
-            else if (e.type == SDL_MOUSEBUTTONDOWN) {
-                int x, y;
-                SDL_GetMouseState(&x, &y);
-                if (isMouseOverButton(prevButton, x, y)) {
-                    printf("Previous button clicked\n");
-                } else if (isMouseOverButton(nextButton, x, y)) {
-                    printf("Next button clicked\n");
-                }
-            }
-        }
-        int x, y;
-        SDL_GetMouseState(&x, &y);
-        if (isMouseOverButton(prevButton, x, y)) {
-            prevButton.box.background_color = buttonColorHover;
-        } else {
-            prevButton.box.background_color = buttonColor;
-        }
-
-        if (isMouseOverButton(nextButton, x, y)) {
-            nextButton.box.background_color = buttonColorHover;
-        } else {
-            nextButton.box.background_color = buttonColor;
-        }
-
-        
-        SDL_SetRenderDrawColor(renderer, 255,255,255,255);
-        SDL_RenderClear(renderer);
-
-        SDL_RenderCopy(renderer, tp_texture,NULL, &renderQuad);
-        renderButton(renderer, prevButton);
-        renderButton(renderer, nextButton);
-
-        SDL_RenderPresent(renderer);
-    }
+    SDL_Event e;
+    startMain(renderer,&e,&font_collection);
+    where_position_recommended_screen(renderer,&e,&font_collection);
+    player_data_screen(renderer,&e,&font_collection,&search_list);
     
     TTF_CloseFont(font_collection.font10);
     TTF_CloseFont(font_collection.font20);

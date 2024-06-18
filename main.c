@@ -72,6 +72,14 @@ typedef struct Node {
     struct Node* next;
 } Node;
 
+typedef struct CircularDoublyLinkedList {
+    Node* head;
+} CircularDoublyLinkedList;
+
+void initList(CircularDoublyLinkedList* list) {
+    list->head = NULL;
+}
+
 Node* createNode(Player player) {
     Node* newNode = (Node*)malloc(sizeof(Node));
     newNode->player = player;
@@ -79,54 +87,57 @@ Node* createNode(Player player) {
     return newNode;
 }
 
-void appendNode(Node** head, Player player) {
-    Node* newNode = createNode(player);
-    if (*head == NULL) {
-        *head = newNode;
-        return;
+void append(CircularDoublyLinkedList* list, Player data) {
+    Node* newNode = createNode(data);
+    if (list->head == NULL) {
+        list->head = newNode;
+        list->head->next = list->head;
+        list->head->prev = list->head;
+    } else {
+        Node* tail = list->head->prev;
+        tail->next = newNode;
+        newNode->prev = tail;
+        newNode->next = list->head;
+        list->head->prev = newNode;
     }
-    Node* temp = *head;
-    while (temp->next != NULL) {
-        temp = temp->next;
-    }
-
-    temp->next = newNode;
-    newNode->prev = temp;
-    
 }
+
 
 //특정 UID를 가진 노드 삭제
-void deleteNode(Node** head, int UID) {
-    Node* temp = *head;
+// void deleteNode(Node** head, int UID) {
+//     Node* temp = *head;
 
-    while(temp != NULL && temp->player.UID != UID) {
-        temp = temp->next;
-    }
+//     while(temp != NULL && temp->player.UID != UID) {
+//         temp = temp->next;
+//     }
 
-    if (temp == NULL) return;
+//     if (temp == NULL) return;
 
-    if (temp->next != NULL) {
-        //임시에 다음 것이 있다면 다음 노드의 이전 노드 주소를 지금 노드의 이전과 같게 해줘야함
-        temp->next->prev = temp->prev;
-    }
-    if (temp->prev != NULL) {
-        temp->prev->next = temp->next;
-    }
-    else {
-        *head = temp->next;
-    }
-    free(temp);
-}
+//     if (temp->next != NULL) {
+//         //임시에 다음 것이 있다면 다음 노드의 이전 노드 주소를 지금 노드의 이전과 같게 해줘야함
+//         temp->next->prev = temp->prev;
+//     }
+//     if (temp->prev != NULL) {
+//         temp->prev->next = temp->next;
+//     }
+//     else {
+//         *head = temp->next;
+//     }
+//     free(temp);
+// }
 
-void printList(Node* head) {
-    Node* temp = head;
-    if (temp == NULL) {
-        printf("empty");
+void printList(CircularDoublyLinkedList* list) {
+    if (list->head == NULL) {
+        printf("List is empty\n");
+        return;
     }
-    while(temp!=NULL) {
-        printf("Name: %s, Position: %s, Age: %d, UID: %d\n", temp->player.name, temp->player.position, temp->player.age, temp->player.UID);
-        temp = temp->next;
-    }
+    Node* current = list->head;
+    do {
+        printf("Name: %s, Position: %s, Age: %d, UID: %d\n", current->player.name, current->player.position, current->player.age, current->player.UID);
+        //printf("%d ", current->player);
+        current = current->next;
+    } while (current != list->head);
+    
 }
 
 int countNodes(Node* head) {
@@ -139,7 +150,7 @@ int countNodes(Node* head) {
     return count;
 }
 
-void readCSV(const char* filename, Node** node) {
+void readCSV(const char* filename, CircularDoublyLinkedList* node) {
     FILE* file = fopen(filename, "r");
     if (file == NULL) {
         perror("Unable to open file");
@@ -295,31 +306,42 @@ void readCSV(const char* filename, Node** node) {
         token = strtok(NULL, ",");
         if (token != NULL) player.UID = atoi(token);
 
-        appendNode(node, player);
+        append(node, player);
     }
     fclose(file);
 }
 
-void searchPlayer(Node* player_head, Node** search_head) {
-    Node* temp = player_head;
-    while(temp!= NULL) {
-        if (temp->player.pa > 170) {
-            //printf("Name: %s Position: %s Age: %d pa: %d\n", temp->player.name, temp->player.position, temp->player.age, temp->player.pa);
-            appendNode(search_head,temp->player);
-        }
-        temp = temp->next;
+void searchPlayer(CircularDoublyLinkedList* player_head, CircularDoublyLinkedList* search_head) {
+    if (player_head->head == NULL) {
+        printf("List is empty\n");
+        return;
     }
+    Node* current = player_head->head;
+    do {
+        if (current->player.pa > 170 && current->player.ca <150 && current->player.age < 20) {
+            append(search_head,current->player);
+        }
+        current = current->next;
+    } while (current != player_head->head);
+
+    // while(current != player_head->head) {
+    //     if (current->player.pa > 170 && current->player.ca <150 && current->player.age < 20) {
+    //         //printf("Name: %s Position: %s Age: %d pa: %d\n", temp->player.name, temp->player.position, temp->player.age, temp->player.pa);
+    //         append(search_head,current->player);
+    //     }
+    //     current = current->next;
+    // }
 }
 
 int main() {
-
-    Node* player_head = NULL;
-    Node* search_head = NULL;
-    readCSV("FM2023.csv", &player_head);
+    CircularDoublyLinkedList player_list;
+    CircularDoublyLinkedList search_list;
+    initList(&player_list);
+    initList(&search_list);
+    readCSV("FM2023.csv", &player_list);
     
-    //printList(head);
-    searchPlayer(player_head, &search_head);
-    printList(search_head);
+    searchPlayer(&player_list, &search_list);
+    printList(&search_list);
     
     return 0;
 }
