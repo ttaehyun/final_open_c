@@ -19,6 +19,8 @@ void logTTFError(const char *msg) {
 //font크기 모음 구조체
 typedef struct Fonts {
     TTF_Font* font10;
+    TTF_Font* font15;
+    TTF_Font* font18;
     TTF_Font* font20;
     TTF_Font* font30;
     TTF_Font* font40;
@@ -53,6 +55,10 @@ SDL_Texture* renderText(SDL_Renderer *renderer, TTF_Font *font, const char *text
     return texture;
 }
 
+void renderBox(SDL_Renderer* r, SDL_Rect rect, SDL_Color color) {
+    SDL_SetRenderDrawColor(r,color.r,color.g,color.b,color.a);
+    SDL_RenderFillRect(r, &rect);
+}
 bool isMouseOverButton(Button button, int x, int y) {
     return x >= button.box.rect.x && x <= button.box.rect.x + button.box.rect.w &&
            y >= button.box.rect.y && y <= button.box.rect.y + button.box.rect.h;
@@ -130,6 +136,59 @@ typedef struct Player {
     int UID;
 
 } Player;
+
+typedef struct pos{
+    int x;
+    int y;
+} pos;
+typedef struct ability_pos {
+    pos corners;            pos crossing;       pos dribbling;          pos finishing;              pos first_touch;
+    pos free_kick_taking;   pos heading;        pos long_shot;          pos long_throws;            pos marking;
+    pos passing;            pos penalty_taking; pos tackling;           pos technique;              pos aggressiion;
+    pos anticipation;       pos bravery;        pos composure;          pos concentration;          pos vision;
+    pos decision;           pos determination;  pos flair;              pos leadership;             pos off_the_ball;
+    pos position;           pos teamwork;       pos work_rate;          pos acceleration;           pos agility;
+    pos balance;            pos jumping_reach;  pos natural_fitness;    pos pace;                   pos stamina;
+    pos strength;           pos stability;      pos foul;               pos contest_performance;    pos injury;
+    pos diversity;          pos aerial_reach;   pos command_of_area;    pos communication;          pos eccentricity;
+    pos handling;           pos kicking;        pos one_on_ones;        pos reflexes;               pos rushing_out; 
+    pos throwing;           pos adaptation;     pos ambition;           pos argue;                  pos loyal; 
+    pos professional;       pos sportmanship;   pos emotional_control;  pos punching;               pos resistant_to_stress;
+} ability_pos;
+typedef struct position_pos {
+    //GK
+    pos GK;
+    //Defender
+    pos DL; pos DC; pos DR; pos WBL; pos WBR;
+    //Midfielder
+    pos DM; pos ML; pos MC; pos MR; 
+    //attacker
+    pos AML; pos AMC; pos AMR; pos ST;
+} position_pos;
+typedef struct data_pos{
+    pos name;
+    pos position;
+    pos age;
+    pos ca; pos pa;
+    pos nationality;
+    pos club;
+    ability_pos ability_pos;
+    position_pos position_pos;
+    pos height;
+    pos weight;
+    pos left;
+    pos right;
+    pos values;
+    pos current_reputation;
+    pos domestic_reputation;
+    pos world_reputation;
+    pos RCA;
+    pos birth;
+    pos number_of_national_team_appearance;
+    pos goals_scored_for_the_national_team;
+    pos salary;
+    pos UID;
+} Data_pos;
 
 typedef struct Node {
     Player player;
@@ -361,7 +420,7 @@ void startMain(SDL_Renderer* r, SDL_Event* e,Fonts* fonts) {
     SDL_Color button_hover_color = {200,200,150,255};
 
     Button titleBox = {{{490, 300, 300, 150},box_color,NULL},textColor,"Football Agency", fonts->font60};
-    Button startButton = {{{550,500,200, 50},button_color,NULL}, textColor,"Start",fonts->font40};
+    Button startButton = {{{550,500,200, 80},button_color,NULL}, textColor,"Start",fonts->font40};
 
     titleBox.box.texture = renderText(r,titleBox.font,titleBox.text,titleBox.textColor);
     startButton.box.texture = renderText(r, startButton.font, startButton.text, startButton.textColor);
@@ -495,40 +554,84 @@ void where_position_recommended_screen(SDL_Renderer* r, SDL_Event* e, Fonts* fon
     SDL_DestroyTexture(goalkeeperButton.box.texture);
 }
 
+
 void player_data_screen(SDL_Renderer* r, SDL_Event* e, Fonts* fonts, Circularlist* list) {
     Node* current = list->head;
 
     SDL_Color textColor = {0,0,0,255};
     SDL_Color box_color = {255,255,255,0};
+    SDL_Color box_color_yellow = {255,226,193,255};
+    SDL_Color box_0 = {255, 255, 255, 0};
     SDL_Color button_color = {200,100,150,255};
     SDL_Color button_hover_color = {200,200,150,255};
     char buffer[12];
     snprintf(buffer, sizeof(buffer), "%d", current->player.age);
+    Data_pos data_pos = {
+      {10,10}, //name
+      {400,40}, //position
+      {560,10}, //age
+      {40,85}, //ca
+      {40,105}, //pa
+      {740,10}, //nationality
+      {10,40}, //club
+      {{30, 90}, {40,90}, {50,90}, {60,90}, {70,90}, {80,90}, {90,90}, {100,90}, {110,90}, {120,90},
+       {30, 100}, {40,100}, {50,100}, {60,100}, {70,100}},
+      {310,10},  
+    };
+    int box_w = 0; int box_h = 0;
     int name_x = 10;
     int name_y = 10;
-    Button nameBox = {{{name_x,name_y,50,20},box_color,NULL}, textColor, "Name:",fonts->font20}; 
-    Button name = {{{name_x+130,name_y,100,20},box_color,NULL}, textColor, current->player.name,fonts->font20};
-    Button birthBox = {{{name_x+300,name_y,100,20},box_color,NULL}, textColor, "Birth:",fonts->font20};
-    Button birth = {{{name_x+ 400,name_y,100,20},box_color,NULL}, textColor, current->player.birth,fonts->font20};
-    Button ageBox = {{{name_x+500,name_y,100,20},box_color,NULL}, textColor, "Age:",fonts->font20};
-    Button age = {{{name_x+600,name_y,50,20},box_color,NULL}, textColor, buffer,fonts->font20};
-    Button nationBox = {{{name_x+700,name_y,100,20},box_color,NULL}, textColor, "Nation:",fonts->font20};
-    Button nation = {{{name_x+800,name_y,100,20},box_color,NULL}, textColor, current->player.nationality,fonts->font20};
+    Button nameBox = {{{data_pos.name.x,data_pos.name.y,50,20},box_color,NULL}, textColor, "Name:",fonts->font20}; 
+    Button birthBox = {{{name_x+310,name_y,50,20},box_color,NULL}, textColor, "Birth:",fonts->font20};
+    Button ageBox = {{{data_pos.age.x,data_pos.age.y,50,20},box_color,NULL}, textColor, "Age:",fonts->font20};
+    Button nationBox = {{{data_pos.nationality.x,data_pos.nationality.y,50,20},box_color,NULL}, textColor, "Nation:",fonts->font20};
+    Button clubBox = {{{data_pos.club.x,data_pos.club.y,50,20},box_color,NULL}, textColor, "Club:",fonts->font20};
 
-    Button prevButton = {{{50, 400, 150, 50}, box_color,NULL}, textColor, "Previous", fonts->font20};
-    Button nextButton = {{{1000, 400, 150, 50}, box_color,NULL}, textColor, "Next", fonts->font20};
+    Button positionBox = {{{data_pos.position.x, data_pos.position.y, box_w, box_h}, box_color, NULL}, textColor, "Position:", fonts->font20};
+    Button caBox = {{{data_pos.ca.x, data_pos.ca.y, box_w, box_h}, box_color, NULL}, textColor, "CA:", fonts->font18};
+    Button paBox = {{{data_pos.pa.x, data_pos.pa.y, box_w, box_h}, box_color, NULL}, textColor, "PA:", fonts->font18};
+
+    Box data_box = {{name_x+10,name_y+60, 1200,500},box_color_yellow, NULL};
+
+    Button name = {{{data_pos.name.x+180,data_pos.name.y,50,20},box_color,NULL}, textColor, current->player.name,fonts->font20};
+    Button birth = {{{name_x+ 400,name_y,50,20},box_color,NULL}, textColor, current->player.birth,fonts->font20};
+    Button age = {{{data_pos.age.x+100,data_pos.age.y,50,20},box_color,NULL}, textColor, buffer,fonts->font20};
+    Button nation = {{{data_pos.nationality.x+100,data_pos.nationality.y,50,20},box_color,NULL}, textColor, current->player.nationality,fonts->font20};
+    Button club = {{{data_pos.club.x + 180,data_pos.club.y,50,20},box_color,NULL}, textColor, current->player.club,fonts->font20};
+    
+    Button position = {{{data_pos.position.x + 100, data_pos.position.y, box_w, box_h}, box_color, NULL}, textColor, current->player.position, fonts->font20};
+    
+    snprintf(buffer, sizeof(buffer), "%d", current->player.ca);
+    Button ca = {{{data_pos.ca.x + 50, data_pos.ca.y, box_w, box_h}, box_color, NULL}, textColor, buffer, fonts->font18};
+    snprintf(buffer, sizeof(buffer), "%d", current->player.pa);
+    Button pa = {{{data_pos.pa.x + 50, data_pos.pa.y, box_w, box_h}, box_color, NULL}, textColor, buffer, fonts->font18};
+
+    Button prevButton = {{{50, 700, 150, 50}, box_color,NULL}, textColor, "Previous", fonts->font20};
+    Button nextButton = {{{1080, 700, 150, 50}, box_color,NULL}, textColor, "Next", fonts->font20};
 
     nameBox.box.texture = renderText(r, nameBox.font,nameBox.text,nameBox.textColor);
-    name.box.texture = renderText(r,name.font,name.text,name.textColor);
     birthBox.box.texture = renderText(r,birthBox.font, birthBox.text,birthBox.textColor);
-    birth.box.texture = renderText(r,birth.font,birth.text,name.textColor);
     ageBox.box.texture = renderText(r, ageBox.font, ageBox.text, ageBox.textColor);
-    age.box.texture = renderText(r,age.font,age.text,age.textColor);
     nationBox.box.texture = renderText(r, nationBox.font, nationBox.text, nationBox.textColor);
+    clubBox.box.texture = renderText(r, clubBox.font, clubBox.text, clubBox.textColor);
+
+    positionBox.box.texture = renderText(r, positionBox.font, positionBox.text, positionBox.textColor);
+    caBox.box.texture = renderText(r, caBox.font, caBox.text, caBox.textColor);
+    paBox.box.texture = renderText(r, paBox.font, paBox.text, paBox.textColor);
+
+    name.box.texture = renderText(r,name.font,name.text,name.textColor);
+    birth.box.texture = renderText(r,birth.font,birth.text,name.textColor);
+    age.box.texture = renderText(r,age.font,age.text,age.textColor);
     nation.box.texture = renderText(r,nation.font,nation.text,nation.textColor);
+    club.box.texture = renderText(r, club.font, club.text, club.textColor);
+
+    position.box.texture = renderText(r, position.font, position.text, position.textColor);
+    ca.box.texture = renderText(r, ca.font, ca.text, ca.textColor);
+    pa.box.texture = renderText(r, pa.font, pa.text, pa.textColor);
 
     prevButton.box.texture = renderText(r,prevButton.font,prevButton.text,prevButton.textColor);
     nextButton.box.texture = renderText(r, nextButton.font, nextButton.text,nextButton.textColor);
+
 
     bool quit = false;
     while(!quit) {
@@ -549,26 +652,52 @@ void player_data_screen(SDL_Renderer* r, SDL_Event* e, Fonts* fonts, Circularlis
                     current = current->prev;
                     name.text = current->player.name;
                     name.box.texture = renderText(r, name.font,name.text,name.textColor);
+
                     birth.text = current->player.birth;
                     birth.box.texture = renderText(r, birth.font,birth.text,birth.textColor);
+
                     snprintf(buffer, sizeof(buffer), "%d", current->player.age);
                     age.text = buffer;
                     age.box.texture = renderText(r, age.font,age.text,age.textColor);
+
                     nation.text = current->player.nationality;
                     nation.box.texture = renderText(r,nation.font,nation.text,nation.textColor);
+
+                    club.text = current->player.club;
+                    club.box.texture = renderText(r, club.font, club.text, club.textColor);
+
+                    position.text = current->player.position;
+                    position.box.texture = renderText(r, position.font, position.text, position.textColor);
+
+                    snprintf(buffer, sizeof(buffer), "%d", current->player.ca);
+                    ca.text = buffer;
+                    ca.box.texture = renderText(r, ca.font, ca.text, ca.textColor);
                 }
                 else if (isMouseOverButton(nextButton,x,y)) {
                     printf("next button");
                     current = current->next;
                     name.text = current->player.name;
                     name.box.texture = renderText(r, name.font,name.text,name.textColor);
+
                     birth.text = current->player.birth;
                     birth.box.texture = renderText(r, birth.font,birth.text,birth.textColor);
+
                     snprintf(buffer, sizeof(buffer), "%d", current->player.age);
                     age.text = buffer;
                     age.box.texture = renderText(r, age.font,age.text,age.textColor);
+
                     nation.text = current->player.nationality;
                     nation.box.texture = renderText(r,nation.font,nation.text,nation.textColor);
+
+                    club.text = current->player.club;
+                    club.box.texture = renderText(r, club.font, club.text, club.textColor);
+
+                    position.text = current->player.position;
+                    position.box.texture = renderText(r, position.font, position.text, position.textColor);
+
+                    snprintf(buffer, sizeof(buffer), "%d", current->player.ca);
+                    ca.text = buffer;
+                    ca.box.texture = renderText(r, ca.font, ca.text, ca.textColor);
                 } 
             }
         }
@@ -587,16 +716,15 @@ void player_data_screen(SDL_Renderer* r, SDL_Event* e, Fonts* fonts, Circularlis
         }
         SDL_SetRenderDrawColor(r, 255,255,255,255);
         SDL_RenderClear(r);
-        renderButton(r, nameBox);
-        renderButton(r, name);
-        renderButton(r, birthBox);
-        renderButton(r, birth);
-        renderButton(r, ageBox);
-        renderButton(r, age);
-        renderButton(r, nationBox);
-        renderButton(r, nation);  
-        renderButton(r, prevButton);
-        renderButton(r,nextButton);
+        renderBox(r,data_box.rect,data_box.background_color);
+
+        renderButton(r, nameBox); renderButton(r, birthBox); renderButton(r, ageBox); renderButton(r, nationBox); renderButton(r, clubBox);
+        renderButton(r, positionBox); renderButton(r, caBox); renderButton(r, paBox);
+
+        renderButton(r, name); renderButton(r, birth); renderButton(r, age); renderButton(r, nation); renderButton(r, club); 
+        renderButton(r, position); renderButton(r, ca); renderButton(r, pa);
+
+        renderButton(r, prevButton); renderButton(r,nextButton);
 
         SDL_RenderPresent(r);
     }
@@ -604,6 +732,7 @@ void player_data_screen(SDL_Renderer* r, SDL_Event* e, Fonts* fonts, Circularlis
     SDL_DestroyTexture(birth.box.texture);
     SDL_DestroyTexture(age.box.texture);
     SDL_DestroyTexture(nation.box.texture);
+    SDL_DestroyTexture(clubBox.box.texture);
 }
 int main() {
     int w = 1280;
@@ -634,6 +763,8 @@ int main() {
 
     Fonts font_collection = {
         TTF_OpenFont("font/MangoDdobak.ttf",10),
+        TTF_OpenFont("font/MangoDdobak.ttf",15),
+        TTF_OpenFont("font/MangoDdobak.ttf",18),
         TTF_OpenFont("font/MangoDdobak.ttf",20),
         TTF_OpenFont("font/MangoDdobak.ttf",30),
         TTF_OpenFont("font/MangoDdobak.ttf",40),
@@ -663,13 +794,13 @@ int main() {
 
     readCSV("FM2023.csv", &player_list);
     searchPlayer(&player_list, &search_list);
-    printList(&search_list);
+    //printList(&search_list);
     
 
     SDL_Event e;
-    startMain(renderer,&e,&font_collection);
-    where_position_recommended_screen(renderer,&e,&font_collection);
-    player_data_screen(renderer,&e,&font_collection,&search_list);
+    //startMain(renderer,&e,&font_collection);
+    //where_position_recommended_screen(renderer,&e,&font_collection);
+    player_data_screen(renderer,&e,&font_collection,&player_list);
     
     TTF_CloseFont(font_collection.font10);
     TTF_CloseFont(font_collection.font20);
