@@ -611,51 +611,62 @@ void player_data_screen(SDL_Renderer* r, SDL_Event* e, Fonts* fonts, Circularlis
     SDL_Color textColor = {0,0,0,255};
     SDL_Color box_color = {255,255,255,0};
     SDL_Color box_color_yellow = {255,226,193,255};
+    SDL_Color box_color_blue = {114,201,255,255};
     SDL_Color box_0 = {255, 255, 255, 0};
     SDL_Color button_color = {200,100,150,255};
     SDL_Color button_hover_color = {200,200,150,255};
 
     Data_pos data_pos = {
       {50,680}, //num id
-      {10,10}, //name
-      {400,50}, //position
-      {560,10}, //age
+      {40,20}, //name
+      {560,50}, //position
+      {560,20}, //age
       {40,85}, //ca
-      {40,105}, //pa
-      {740,10}, //nationality
-      {10,40}, //club
-      {{65, 125}, {65,145}, {65,165}, {65,185}, {75,205}, {85,225}, {65,245}, {70,265}, {80,285}, {65,305},
-       {30, 110}, {40,110}, {50,110}, {60,110}, {70,110}},
-      {310,10},  
+      {180,85}, //pa
+      {760,20}, //nationality
+      {40,50}, //club
+      {{60,125}, {260,125}, {460,125}, {660,125}, {860,125}, {1060,125},
+       {60,165}, {270,165}, {460,165}, {660,165}, {860,165}, {1060,165},
+       {60,205}, {270,205}, {460,205}, {660,205}, {860,205}, {1060,205},
+       {85,245}, {250,245}, {460,245}, {660,245}, {860,245}, {1060,245},
+       {75,285}, {260,285}, {460,285}, {660,285}, {860,285}, {1060,285},
+       {60,325}, {280,325}, {460,325}, {660,325}, {860,325}, {1060,325},
+       {60,365}, {260,365}, {460,365}, {660,365}, {860,365}, {1060,365},
+       {100,405}, {300,405}, {460,405}, {660,405}, {860,405}, {1060,405},
+       {60,445}, {270,445}, {460,445}, {660,445}, {860,445}, {1060,445},
+       {60,485}, {270,485}, {460,485}, {660,485}, {860,485}, {1060,485}},
+      {{60, 525}, {125,525}, {185,525}, {245,525}, {305,525}, {365,525}, {425,525}, {485,525}, {545,525}, {605,525}}, //position
+      {1270,365}, //height
+      {1270,405}, //weight
+      {1270,445}, //left
+      {1270,485}, //right
+      {1270,525}, //values
+      {110,545}, //current_reputation
+      {120,570}, //domestice
+      {100,595}, //world
+      {860,545}, //RCA
+      {340,20}, //birth
+      {480,545}, //number of national team
+      {460,570}, //goals
+      {1270,565}, //salary
+      {760,50} //UID
     };
     int box_w = 0; int box_h = 0;
-    int name_x = 10;
-    int name_y = 10;
-    Button nameBox = {{{data_pos.name.x,data_pos.name.y,50,20},box_color,NULL}, textColor, "Name",fonts->font20}; 
-    Button birthBox = {{{name_x+310,name_y,50,20},box_color,NULL}, textColor, "Birth",fonts->font20};
-    Button ageBox = {{{data_pos.age.x,data_pos.age.y,50,20},box_color,NULL}, textColor, "Age",fonts->font20};
-    Button nationBox = {{{data_pos.nationality.x,data_pos.nationality.y,50,20},box_color,NULL}, textColor, "Nation",fonts->font20};
-    Button clubBox = {{{data_pos.club.x,data_pos.club.y,50,20},box_color,NULL}, textColor, "Club",fonts->font20};
-
-    Button positionBox = {{{data_pos.position.x, data_pos.position.y, box_w, box_h}, box_color, NULL}, textColor, "Position", fonts->font20};
-    Button caBox = {{{data_pos.ca.x, data_pos.ca.y, box_w, box_h}, box_color, NULL}, textColor, "CA", fonts->font18};
-    Button paBox = {{{data_pos.pa.x, data_pos.pa.y, box_w, box_h}, box_color, NULL}, textColor, "PA", fonts->font18};
-
     Button cornersBox = {{{data_pos.ability_pos.corners.x, data_pos.ability_pos.corners.y, box_w, box_h}, box_color, NULL}, textColor, "Corners", fonts->font18};
     Button crossingBox = {{{data_pos.ability_pos.crossing.x, data_pos.ability_pos.crossing.y, box_w, box_h}, box_color, NULL}, textColor, "Crossing", fonts->font18};
     Button dribblingBox = {{{data_pos.ability_pos.dribbling.x, data_pos.ability_pos.dribbling.y, box_w, box_h}, box_color, NULL}, textColor, "Dribbling", fonts->font18};
     Button finishingBox = {{{data_pos.ability_pos.finishing.x, data_pos.ability_pos.finishing.y, box_w, box_h}, box_color, NULL}, textColor, "Finishing", fonts->font18};
-    Button first_touchBox = {{{data_pos.ability_pos.first_touch.x, data_pos.ability_pos.first_touch.y, box_w, box_h}, box_color, NULL}, textColor, "First touch", fonts->font18};
-    Button free_kick_takingBox = {{{data_pos.ability_pos.free_kick_taking.x, data_pos.ability_pos.free_kick_taking.y, box_w, box_h}, box_color, NULL}, textColor, "Free kick taking", fonts->font18};
+    Button firstTouchBox = {{{data_pos.ability_pos.first_touch.x, data_pos.ability_pos.first_touch.y, box_w, box_h}, box_color, NULL}, textColor, "First Touch", fonts->font18};
+    Button freeKickTakingBox = {{{data_pos.ability_pos.free_kick_taking.x, data_pos.ability_pos.free_kick_taking.y, box_w, box_h}, box_color, NULL}, textColor, "Free Kick Taking", fonts->font18};
     Button headingBox = {{{data_pos.ability_pos.heading.x, data_pos.ability_pos.heading.y, box_w, box_h}, box_color, NULL}, textColor, "Heading", fonts->font18};
-    Button long_shotBox = {{{data_pos.ability_pos.long_shot.x, data_pos.ability_pos.long_shot.y, box_w, box_h}, box_color, NULL}, textColor, "Long shot", fonts->font18};
-    Button long_throwsBox = {{{data_pos.ability_pos.long_throws.x, data_pos.ability_pos.long_throws.y, box_w, box_h}, box_color, NULL}, textColor, "Long throws", fonts->font18};
+    Button longShotBox = {{{data_pos.ability_pos.long_shot.x, data_pos.ability_pos.long_shot.y, box_w, box_h}, box_color, NULL}, textColor, "Long Shot", fonts->font18};
+    Button longThrowsBox = {{{data_pos.ability_pos.long_throws.x, data_pos.ability_pos.long_throws.y, box_w, box_h}, box_color, NULL}, textColor, "Long Throws", fonts->font18};
     Button markingBox = {{{data_pos.ability_pos.marking.x, data_pos.ability_pos.marking.y, box_w, box_h}, box_color, NULL}, textColor, "Marking", fonts->font18};
     Button passingBox = {{{data_pos.ability_pos.passing.x, data_pos.ability_pos.passing.y, box_w, box_h}, box_color, NULL}, textColor, "Passing", fonts->font18};
-    Button penalty_takingBox = {{{data_pos.ability_pos.penalty_taking.x, data_pos.ability_pos.penalty_taking.y, box_w, box_h}, box_color, NULL}, textColor, "Penalty_taking", fonts->font18};
+    Button penaltyTakingBox = {{{data_pos.ability_pos.penalty_taking.x, data_pos.ability_pos.penalty_taking.y, box_w, box_h}, box_color, NULL}, textColor, "Penalty Taking", fonts->font18};
     Button tacklingBox = {{{data_pos.ability_pos.tackling.x, data_pos.ability_pos.tackling.y, box_w, box_h}, box_color, NULL}, textColor, "Tackling", fonts->font18};
     Button techniqueBox = {{{data_pos.ability_pos.technique.x, data_pos.ability_pos.technique.y, box_w, box_h}, box_color, NULL}, textColor, "Technique", fonts->font18};
-    Button aggressiionBox = {{{data_pos.ability_pos.aggressiion.x, data_pos.ability_pos.aggressiion.y, box_w, box_h}, box_color, NULL}, textColor, "Aggression", fonts->font18};
+    Button aggressionBox = {{{data_pos.ability_pos.aggressiion.x, data_pos.ability_pos.aggressiion.y, box_w, box_h}, box_color, NULL}, textColor, "Aggression", fonts->font18};
     Button anticipationBox = {{{data_pos.ability_pos.anticipation.x, data_pos.ability_pos.anticipation.y, box_w, box_h}, box_color, NULL}, textColor, "Anticipation", fonts->font18};
     Button braveryBox = {{{data_pos.ability_pos.bravery.x, data_pos.ability_pos.bravery.y, box_w, box_h}, box_color, NULL}, textColor, "Bravery", fonts->font18};
     Button composureBox = {{{data_pos.ability_pos.composure.x, data_pos.ability_pos.composure.y, box_w, box_h}, box_color, NULL}, textColor, "Composure", fonts->font18};
@@ -665,27 +676,91 @@ void player_data_screen(SDL_Renderer* r, SDL_Event* e, Fonts* fonts, Circularlis
     Button determinationBox = {{{data_pos.ability_pos.determination.x, data_pos.ability_pos.determination.y, box_w, box_h}, box_color, NULL}, textColor, "Determination", fonts->font18};
     Button flairBox = {{{data_pos.ability_pos.flair.x, data_pos.ability_pos.flair.y, box_w, box_h}, box_color, NULL}, textColor, "Flair", fonts->font18};
     Button leadershipBox = {{{data_pos.ability_pos.leadership.x, data_pos.ability_pos.leadership.y, box_w, box_h}, box_color, NULL}, textColor, "Leadership", fonts->font18};
-    Button off_the_ballBox = {{{data_pos.ability_pos.off_the_ball.x, data_pos.ability_pos.off_the_ball.y, box_w, box_h}, box_color, NULL}, textColor, "Off the ball", fonts->font18};
+    Button offTheBallBox = {{{data_pos.ability_pos.off_the_ball.x, data_pos.ability_pos.off_the_ball.y, box_w, box_h}, box_color, NULL}, textColor, "Off The Ball", fonts->font18};
     Button positionBox = {{{data_pos.ability_pos.position.x, data_pos.ability_pos.position.y, box_w, box_h}, box_color, NULL}, textColor, "Position", fonts->font18};
     Button teamworkBox = {{{data_pos.ability_pos.teamwork.x, data_pos.ability_pos.teamwork.y, box_w, box_h}, box_color, NULL}, textColor, "Teamwork", fonts->font18};
-    Button work_rateBox = {{{data_pos.ability_pos.work_rate.x, data_pos.ability_pos.work_rate.y, box_w, box_h}, box_color, NULL}, textColor, "Work rate", fonts->font18};
-    Button acceleration = {{{data_pos.ability_pos.acceleration.x, data_pos.ability_pos.acceleration.y, box_w, box_h}, box_color, NULL}, textColor, "Acceleration", fonts->font18};
+    Button workRateBox = {{{data_pos.ability_pos.work_rate.x, data_pos.ability_pos.work_rate.y, box_w, box_h}, box_color, NULL}, textColor, "Work Rate", fonts->font18};
+    Button accelerationBox = {{{data_pos.ability_pos.acceleration.x, data_pos.ability_pos.acceleration.y, box_w, box_h}, box_color, NULL}, textColor, "Acceleration", fonts->font18};
     Button agilityBox = {{{data_pos.ability_pos.agility.x, data_pos.ability_pos.agility.y, box_w, box_h}, box_color, NULL}, textColor, "Agility", fonts->font18};
     Button balanceBox = {{{data_pos.ability_pos.balance.x, data_pos.ability_pos.balance.y, box_w, box_h}, box_color, NULL}, textColor, "Balance", fonts->font18};
-    Button jumping_reachBox = {{{data_pos.ability_pos.jumping_reach.x, data_pos.ability_pos.jumping_reach.y, box_w, box_h}, box_color, NULL}, textColor, "Jumping reach", fonts->font18};
-    Button natural_fitnessBox = {{{data_pos.ability_pos.natural_fitness.x, data_pos.ability_pos.natural_fitness.y, box_w, box_h}, box_color, NULL}, textColor, "Natural fitness", fonts->font18};
+    Button jumpingReachBox = {{{data_pos.ability_pos.jumping_reach.x, data_pos.ability_pos.jumping_reach.y, box_w, box_h}, box_color, NULL}, textColor, "Jumping Reach", fonts->font18};
+    Button naturalFitnessBox = {{{data_pos.ability_pos.natural_fitness.x, data_pos.ability_pos.natural_fitness.y, box_w, box_h}, box_color, NULL}, textColor, "Natural Fitness", fonts->font18};
     Button paceBox = {{{data_pos.ability_pos.pace.x, data_pos.ability_pos.pace.y, box_w, box_h}, box_color, NULL}, textColor, "Pace", fonts->font18};
     Button staminaBox = {{{data_pos.ability_pos.stamina.x, data_pos.ability_pos.stamina.y, box_w, box_h}, box_color, NULL}, textColor, "Stamina", fonts->font18};
+    Button strengthBox = {{{data_pos.ability_pos.strength.x, data_pos.ability_pos.strength.y, box_w, box_h}, box_color, NULL}, textColor, "Strength", fonts->font18};
+    Button stabilityBox = {{{data_pos.ability_pos.stability.x, data_pos.ability_pos.stability.y, box_w, box_h}, box_color, NULL}, textColor, "Stability", fonts->font18};
     Button foulBox = {{{data_pos.ability_pos.foul.x, data_pos.ability_pos.foul.y, box_w, box_h}, box_color, NULL}, textColor, "Foul", fonts->font18};
-    Button contest_performanceBox = {{{data_pos.ability_pos.contest_performance.x, data_pos.ability_pos.contest_performance.y, box_w, box_h}, box_color, NULL}, textColor, "Contest_performance", fonts->font18};
+    Button contestPerformanceBox = {{{data_pos.ability_pos.contest_performance.x, data_pos.ability_pos.contest_performance.y, box_w, box_h}, box_color, NULL}, textColor, "Contest Performance", fonts->font18};
+    Button injuryBox = {{{data_pos.ability_pos.injury.x, data_pos.ability_pos.injury.y, box_w, box_h}, box_color, NULL}, textColor, "Injury", fonts->font18};
+    Button diversityBox = {{{data_pos.ability_pos.diversity.x, data_pos.ability_pos.diversity.y, box_w, box_h}, box_color, NULL}, textColor, "Diversity", fonts->font18};
+    Button aerialReachBox = {{{data_pos.ability_pos.aerial_reach.x, data_pos.ability_pos.aerial_reach.y, box_w, box_h}, box_color, NULL}, textColor, "Aerial Reach", fonts->font18};
+    Button commandOfAreaBox = {{{data_pos.ability_pos.command_of_area.x, data_pos.ability_pos.command_of_area.y, box_w, box_h}, box_color, NULL}, textColor, "Command Of Area", fonts->font18};
+    Button communicationBox = {{{data_pos.ability_pos.communication.x, data_pos.ability_pos.communication.y, box_w, box_h}, box_color, NULL}, textColor, "Communication", fonts->font18};
+    Button eccentricityBox = {{{data_pos.ability_pos.eccentricity.x, data_pos.ability_pos.eccentricity.y, box_w, box_h}, box_color, NULL}, textColor, "Eccentricity", fonts->font18};
+    Button handlingBox = {{{data_pos.ability_pos.handling.x, data_pos.ability_pos.handling.y, box_w, box_h}, box_color, NULL}, textColor, "Handling", fonts->font18};
+    Button kickingBox = {{{data_pos.ability_pos.kicking.x, data_pos.ability_pos.kicking.y, box_w, box_h}, box_color, NULL}, textColor, "Kicking", fonts->font18};
+    Button oneOnOnesBox = {{{data_pos.ability_pos.one_on_ones.x, data_pos.ability_pos.one_on_ones.y, box_w, box_h}, box_color, NULL}, textColor, "One On Ones", fonts->font18};
+    Button reflexesBox = {{{data_pos.ability_pos.reflexes.x, data_pos.ability_pos.reflexes.y, box_w, box_h}, box_color, NULL}, textColor, "Reflexes", fonts->font18};
+    Button rushingOutBox = {{{data_pos.ability_pos.rushing_out.x, data_pos.ability_pos.rushing_out.y, box_w, box_h}, box_color, NULL}, textColor, "Rushing Out", fonts->font18};
+    Button throwingBox = {{{data_pos.ability_pos.throwing.x, data_pos.ability_pos.throwing.y, box_w, box_h}, box_color, NULL}, textColor, "Throwing", fonts->font18};
+    Button adaptationBox = {{{data_pos.ability_pos.adaptation.x, data_pos.ability_pos.adaptation.y, box_w, box_h}, box_color, NULL}, textColor, "Adaptation", fonts->font18};
+    Button ambitionBox = {{{data_pos.ability_pos.ambition.x, data_pos.ability_pos.ambition.y, box_w, box_h}, box_color, NULL}, textColor, "Ambition", fonts->font18};
+    Button argueBox = {{{data_pos.ability_pos.argue.x, data_pos.ability_pos.argue.y, box_w, box_h}, box_color, NULL}, textColor, "Argue", fonts->font18};
+    Button loyalBox = {{{data_pos.ability_pos.loyal.x, data_pos.ability_pos.loyal.y, box_w, box_h}, box_color, NULL}, textColor, "Loyal", fonts->font18};
+    Button professionalBox = {{{data_pos.ability_pos.professional.x, data_pos.ability_pos.professional.y, box_w, box_h}, box_color, NULL}, textColor, "Professional", fonts->font18};
+    Button sportmanshipBox = {{{data_pos.ability_pos.sportmanship.x, data_pos.ability_pos.sportmanship.y, box_w, box_h}, box_color, NULL}, textColor, "Sportmanship", fonts->font18};
+    Button emotionalControlBox = {{{data_pos.ability_pos.emotional_control.x, data_pos.ability_pos.emotional_control.y, box_w, box_h}, box_color, NULL}, textColor, "Emotional Control", fonts->font18};
+    Button punchingBox = {{{data_pos.ability_pos.punching.x, data_pos.ability_pos.punching.y, box_w, box_h}, box_color, NULL}, textColor, "Punching", fonts->font18};
+    Button resistantToStressBox = {{{data_pos.ability_pos.resistant_to_stress.x, data_pos.ability_pos.resistant_to_stress.y, box_w, box_h}, box_color, NULL}, textColor, "Resistant To Stress", fonts->font18};
+
+    // Position Boxes
+    Button GKBox = {{{data_pos.position_pos.GK.x, data_pos.position_pos.GK.y, box_w, box_h}, box_color, NULL}, textColor, "GK", fonts->font18};
+    Button DLBox = {{{data_pos.position_pos.DL.x, data_pos.position_pos.DL.y, box_w, box_h}, box_color, NULL}, textColor, "DL", fonts->font18};
+    Button DCBox = {{{data_pos.position_pos.DC.x, data_pos.position_pos.DC.y, box_w, box_h}, box_color, NULL}, textColor, "DC", fonts->font18};
+    Button DRBox = {{{data_pos.position_pos.DR.x, data_pos.position_pos.DR.y, box_w, box_h}, box_color, NULL}, textColor, "DR", fonts->font18};
+    Button WBLBox = {{{data_pos.position_pos.WBL.x, data_pos.position_pos.WBL.y, box_w, box_h}, box_color, NULL}, textColor, "WBL", fonts->font18};
+    Button WBRBox = {{{data_pos.position_pos.WBR.x, data_pos.position_pos.WBR.y, box_w, box_h}, box_color, NULL}, textColor, "WBR", fonts->font18};
+    Button DMBox = {{{data_pos.position_pos.DM.x, data_pos.position_pos.DM.y, box_w, box_h}, box_color, NULL}, textColor, "DM", fonts->font18};
+    Button MLBox = {{{data_pos.position_pos.ML.x, data_pos.position_pos.ML.y, box_w, box_h}, box_color, NULL}, textColor, "ML", fonts->font18};
+    Button MCBox = {{{data_pos.position_pos.MC.x, data_pos.position_pos.MC.y, box_w, box_h}, box_color, NULL}, textColor, "MC", fonts->font18};
+    Button MRBox = {{{data_pos.position_pos.MR.x, data_pos.position_pos.MR.y, box_w, box_h}, box_color, NULL}, textColor, "MR", fonts->font18};
+    Button AMLBox = {{{data_pos.position_pos.AML.x, data_pos.position_pos.AML.y, box_w, box_h}, box_color, NULL}, textColor, "AML", fonts->font18};
+    Button AMCBox = {{{data_pos.position_pos.AMC.x, data_pos.position_pos.AMC.y, box_w, box_h}, box_color, NULL}, textColor, "AMC", fonts->font18};
+    Button AMRBox = {{{data_pos.position_pos.AMR.x, data_pos.position_pos.AMR.y, box_w, box_h}, box_color, NULL}, textColor, "AMR", fonts->font18};
+    Button STBox = {{{data_pos.position_pos.ST.x, data_pos.position_pos.ST.y, box_w, box_h}, box_color, NULL}, textColor, "ST", fonts->font18};
+
+    // Additional Data Fields
     
-    Box data_box = {{name_x+10,name_y+60, 1200,500},box_color_yellow, NULL};
+    Button nameBox = {{{data_pos.name.x, data_pos.name.y, box_w, box_h}, box_color, NULL}, textColor, "Name", fonts->font20};
+    Button where_positionBox = {{{data_pos.position.x, data_pos.position.y, box_w, box_h}, box_color, NULL}, textColor, "Position", fonts->font20};
+    Button ageBox = {{{data_pos.age.x, data_pos.age.y, box_w, box_h}, box_color, NULL}, textColor, "Age", fonts->font20};
+    Button caBox = {{{data_pos.ca.x, data_pos.ca.y, box_w, box_h}, box_color, NULL}, textColor, "CA", fonts->font18};
+    Button paBox = {{{data_pos.pa.x, data_pos.pa.y, box_w, box_h}, box_color, NULL}, textColor, "PA", fonts->font18};
+    Button nationalityBox = {{{data_pos.nationality.x, data_pos.nationality.y, box_w, box_h}, box_color, NULL}, textColor, "Nationality", fonts->font20};
+    Button clubBox = {{{data_pos.club.x, data_pos.club.y, box_w, box_h}, box_color, NULL}, textColor, "Club", fonts->font20};
+    Button heightBox = {{{data_pos.height.x, data_pos.height.y, box_w, box_h}, box_color, NULL}, textColor, "Height", fonts->font18};
+    Button weightBox = {{{data_pos.weight.x, data_pos.weight.y, box_w, box_h}, box_color, NULL}, textColor, "Weight", fonts->font18};
+    Button leftBox = {{{data_pos.left.x, data_pos.left.y, box_w, box_h}, box_color, NULL}, textColor, "Left", fonts->font18};
+    Button rightBox = {{{data_pos.right.x, data_pos.right.y, box_w, box_h}, box_color, NULL}, textColor, "Right", fonts->font18};
+    Button valuesBox = {{{data_pos.values.x, data_pos.values.y, box_w, box_h}, box_color, NULL}, textColor, "Values", fonts->font18};
+    Button currentReputationBox = {{{data_pos.current_reputation.x, data_pos.current_reputation.y, box_w, box_h}, box_color, NULL}, textColor, "Current Reputation", fonts->font18};
+    Button domesticReputationBox = {{{data_pos.domestic_reputation.x, data_pos.domestic_reputation.y, box_w, box_h}, box_color, NULL}, textColor, "Domestic Reputation", fonts->font18};
+    Button worldReputationBox = {{{data_pos.world_reputation.x, data_pos.world_reputation.y, box_w, box_h}, box_color, NULL}, textColor, "World Reputation", fonts->font18};
+    Button RCABBox = {{{data_pos.RCA.x, data_pos.RCA.y, box_w, box_h}, box_color, NULL}, textColor, "RCA", fonts->font18};
+    Button birthBox = {{{data_pos.birth.x, data_pos.birth.y, box_w, box_h}, box_color, NULL}, textColor, "Birth", fonts->font20};
+    Button numberOfNationalTeamAppearanceBox = {{{data_pos.number_of_national_team_appearance.x, data_pos.number_of_national_team_appearance.y, box_w, box_h}, box_color, NULL}, textColor, "National Team Appearances", fonts->font18};
+    Button goalsScoredForNationalTeamBox = {{{data_pos.goals_scored_for_the_national_team.x, data_pos.goals_scored_for_the_national_team.y, box_w, box_h}, box_color, NULL}, textColor, "National Team Goals", fonts->font18};
+    Button salaryBox = {{{data_pos.salary.x, data_pos.salary.y, box_w, box_h}, box_color, NULL}, textColor, "Salary", fonts->font18};
+    Button UIDBox = {{{data_pos.UID.x, data_pos.UID.y, box_w, box_h}, box_color, NULL}, textColor, "UID", fonts->font20};
+
+    Box data_box = {{20,70, 1200,580},box_color_yellow, NULL};
+    Box blue_box = {{data_pos.height.x-40,data_pos.height.y-15, 170,230},box_color_blue, NULL};
 
     Button numIdBox = {{{data_pos.numId.x,data_pos.numId.y,box_w,box_h},box_color,NULL}, textColor, to_char(*idCounter-1) ,fonts->font20};
     Button IdBox = {{{data_pos.numId.x + 50,data_pos.numId.y,box_w,box_h},box_color,NULL}, textColor, to_char(current->id) ,fonts->font20};
 
     Button name = {{{data_pos.name.x+180,data_pos.name.y,50,20},box_color,NULL}, textColor, current->player.name,fonts->font20};
-    Button birth = {{{name_x+ 400,name_y,50,20},box_color,NULL}, textColor, current->player.birth,fonts->font20};
+    Button birth = {{{data_pos.birth.x,data_pos.birth.y,50,20},box_color,NULL}, textColor, current->player.birth,fonts->font20};
     Button age = {{{data_pos.age.x+100,data_pos.age.y,50,20},box_color,NULL}, textColor, to_char(current->player.age),fonts->font20};
     Button nation = {{{data_pos.nationality.x+100,data_pos.nationality.y,50,20},box_color,NULL}, textColor, current->player.nationality,fonts->font20};
     Button club = {{{data_pos.club.x + 180,data_pos.club.y,50,20},box_color,NULL}, textColor, current->player.club,fonts->font20};
@@ -712,26 +787,110 @@ void player_data_screen(SDL_Renderer* r, SDL_Event* e, Fonts* fonts, Circularlis
     numIdBox.box.texture = renderText(r, numIdBox.font, numIdBox.text, numIdBox.textColor);
     IdBox.box.texture = renderText(r, IdBox.font, IdBox.text, IdBox.textColor);
 
-    nameBox.box.texture = renderText(r, nameBox.font,nameBox.text,nameBox.textColor);
-    birthBox.box.texture = renderText(r,birthBox.font, birthBox.text,birthBox.textColor);
-    ageBox.box.texture = renderText(r, ageBox.font, ageBox.text, ageBox.textColor);
-    nationBox.box.texture = renderText(r, nationBox.font, nationBox.text, nationBox.textColor);
-    clubBox.box.texture = renderText(r, clubBox.font, clubBox.text, clubBox.textColor);
-
-    positionBox.box.texture = renderText(r, positionBox.font, positionBox.text, positionBox.textColor);
-    caBox.box.texture = renderText(r, caBox.font, caBox.text, caBox.textColor);
-    paBox.box.texture = renderText(r, paBox.font, paBox.text, paBox.textColor);
-
-    cornersBox.box.texture = renderText(r, cornersBox.font, cornersBox.text, cornersBox.textColor);
+    // Assuming renderText is a function that renders text and returns a texture
+    // And r is the renderer
+    cornersBox.box.texture = renderText(r, cornersBox.font, cornersBox.text,cornersBox.textColor);
+    markingBox.box.texture = renderText(r, markingBox.font, markingBox.text, markingBox.textColor);
     crossingBox.box.texture = renderText(r, crossingBox.font, crossingBox.text, crossingBox.textColor);
     dribblingBox.box.texture = renderText(r, dribblingBox.font, dribblingBox.text, dribblingBox.textColor);
     finishingBox.box.texture = renderText(r, finishingBox.font, finishingBox.text, finishingBox.textColor);
-    first_touchBox.box.texture = renderText(r, first_touchBox.font, first_touchBox.text, first_touchBox.textColor);
-    free_kick_takingBox.box.texture = renderText(r, free_kick_takingBox.font, free_kick_takingBox.text, free_kick_takingBox.textColor);
+    firstTouchBox.box.texture = renderText(r, firstTouchBox.font, firstTouchBox.text, firstTouchBox.textColor);
+    freeKickTakingBox.box.texture = renderText(r, freeKickTakingBox.font, freeKickTakingBox.text, freeKickTakingBox.textColor);
     headingBox.box.texture = renderText(r, headingBox.font, headingBox.text, headingBox.textColor);
-    long_shotBox.box.texture = renderText(r, long_shotBox.font, long_shotBox.text, long_shotBox.textColor);
-    long_throwsBox.box.texture = renderText(r, long_throwsBox.font, long_throwsBox.text, long_throwsBox.textColor);
+    longShotBox.box.texture = renderText(r, longShotBox.font, longShotBox.text, longShotBox.textColor);
+    longThrowsBox.box.texture = renderText(r, longThrowsBox.font, longThrowsBox.text, longThrowsBox.textColor);
     markingBox.box.texture = renderText(r, markingBox.font, markingBox.text, markingBox.textColor);
+    passingBox.box.texture = renderText(r, passingBox.font, passingBox.text, passingBox.textColor);
+    penaltyTakingBox.box.texture = renderText(r, penaltyTakingBox.font, penaltyTakingBox.text, penaltyTakingBox.textColor);
+    tacklingBox.box.texture = renderText(r, tacklingBox.font, tacklingBox.text, tacklingBox.textColor);
+    techniqueBox.box.texture = renderText(r, techniqueBox.font, techniqueBox.text, techniqueBox.textColor);
+    aggressionBox.box.texture = renderText(r, aggressionBox.font, aggressionBox.text, aggressionBox.textColor);
+    anticipationBox.box.texture = renderText(r, anticipationBox.font, anticipationBox.text, anticipationBox.textColor);
+    braveryBox.box.texture = renderText(r, braveryBox.font, braveryBox.text, braveryBox.textColor);
+    composureBox.box.texture = renderText(r, composureBox.font, composureBox.text, composureBox.textColor);
+    concentrationBox.box.texture = renderText(r, concentrationBox.font, concentrationBox.text, concentrationBox.textColor);
+    visionBox.box.texture = renderText(r, visionBox.font, visionBox.text, visionBox.textColor);
+    decisionBox.box.texture = renderText(r, decisionBox.font, decisionBox.text, decisionBox.textColor);
+    determinationBox.box.texture = renderText(r, determinationBox.font, determinationBox.text, determinationBox.textColor);
+    flairBox.box.texture = renderText(r, flairBox.font, flairBox.text, flairBox.textColor);
+    leadershipBox.box.texture = renderText(r, leadershipBox.font, leadershipBox.text, leadershipBox.textColor);
+    offTheBallBox.box.texture = renderText(r, offTheBallBox.font, offTheBallBox.text, offTheBallBox.textColor);
+    positionBox.box.texture = renderText(r, positionBox.font, positionBox.text, positionBox.textColor);
+    teamworkBox.box.texture = renderText(r, teamworkBox.font, teamworkBox.text, teamworkBox.textColor);
+    workRateBox.box.texture = renderText(r, workRateBox.font, workRateBox.text, workRateBox.textColor);
+    accelerationBox.box.texture = renderText(r, accelerationBox.font, accelerationBox.text, accelerationBox.textColor);
+    agilityBox.box.texture = renderText(r, agilityBox.font, agilityBox.text, agilityBox.textColor);
+    balanceBox.box.texture = renderText(r, balanceBox.font, balanceBox.text, balanceBox.textColor);
+    jumpingReachBox.box.texture = renderText(r, jumpingReachBox.font, jumpingReachBox.text, jumpingReachBox.textColor);
+    naturalFitnessBox.box.texture = renderText(r, naturalFitnessBox.font, naturalFitnessBox.text, naturalFitnessBox.textColor);
+    paceBox.box.texture = renderText(r, paceBox.font, paceBox.text, paceBox.textColor);
+    staminaBox.box.texture = renderText(r, staminaBox.font, staminaBox.text, staminaBox.textColor);
+    strengthBox.box.texture = renderText(r, strengthBox.font, strengthBox.text, strengthBox.textColor);
+    stabilityBox.box.texture = renderText(r, stabilityBox.font, stabilityBox.text, stabilityBox.textColor);
+    foulBox.box.texture = renderText(r, foulBox.font, foulBox.text, foulBox.textColor);
+    contestPerformanceBox.box.texture = renderText(r, contestPerformanceBox.font, contestPerformanceBox.text, contestPerformanceBox.textColor);
+    injuryBox.box.texture = renderText(r, injuryBox.font, injuryBox.text, injuryBox.textColor);
+    diversityBox.box.texture = renderText(r, diversityBox.font, diversityBox.text, diversityBox.textColor);
+    aerialReachBox.box.texture = renderText(r, aerialReachBox.font, aerialReachBox.text, aerialReachBox.textColor);
+    commandOfAreaBox.box.texture = renderText(r, commandOfAreaBox.font, commandOfAreaBox.text, commandOfAreaBox.textColor);
+    communicationBox.box.texture = renderText(r, communicationBox.font, communicationBox.text, communicationBox.textColor);
+    eccentricityBox.box.texture = renderText(r, eccentricityBox.font, eccentricityBox.text, eccentricityBox.textColor);
+    handlingBox.box.texture = renderText(r, handlingBox.font, handlingBox.text, handlingBox.textColor);
+    kickingBox.box.texture = renderText(r, kickingBox.font, kickingBox.text, kickingBox.textColor);
+    oneOnOnesBox.box.texture = renderText(r, oneOnOnesBox.font, oneOnOnesBox.text, oneOnOnesBox.textColor);
+    reflexesBox.box.texture = renderText(r, reflexesBox.font, reflexesBox.text, reflexesBox.textColor);
+    rushingOutBox.box.texture = renderText(r, rushingOutBox.font, rushingOutBox.text, rushingOutBox.textColor);
+    throwingBox.box.texture = renderText(r, throwingBox.font, throwingBox.text, throwingBox.textColor);
+    adaptationBox.box.texture = renderText(r, adaptationBox.font, adaptationBox.text, adaptationBox.textColor);
+    ambitionBox.box.texture = renderText(r, ambitionBox.font, ambitionBox.text, ambitionBox.textColor);
+    argueBox.box.texture = renderText(r, argueBox.font, argueBox.text, argueBox.textColor);
+    loyalBox.box.texture = renderText(r, loyalBox.font, loyalBox.text, loyalBox.textColor);
+    professionalBox.box.texture = renderText(r, professionalBox.font, professionalBox.text, professionalBox.textColor);
+    sportmanshipBox.box.texture = renderText(r, sportmanshipBox.font, sportmanshipBox.text, sportmanshipBox.textColor);
+    emotionalControlBox.box.texture = renderText(r, emotionalControlBox.font, emotionalControlBox.text, emotionalControlBox.textColor);
+    punchingBox.box.texture = renderText(r, punchingBox.font, punchingBox.text, punchingBox.textColor);
+    resistantToStressBox.box.texture = renderText(r, resistantToStressBox.font, resistantToStressBox.text, resistantToStressBox.textColor);
+
+    // Position Boxes
+    GKBox.box.texture = renderText(r, GKBox.font, GKBox.text, GKBox.textColor);
+    DLBox.box.texture = renderText(r, DLBox.font, DLBox.text, DLBox.textColor);
+    DCBox.box.texture = renderText(r, DCBox.font, DCBox.text, DCBox.textColor);
+    DRBox.box.texture = renderText(r, DRBox.font, DRBox.text, DRBox.textColor);
+    WBLBox.box.texture = renderText(r, WBLBox.font, WBLBox.text, WBLBox.textColor);
+    WBRBox.box.texture = renderText(r, WBRBox.font, WBRBox.text, WBRBox.textColor);
+    DMBox.box.texture = renderText(r, DMBox.font, DMBox.text, DMBox.textColor);
+    MLBox.box.texture = renderText(r, MLBox.font, MLBox.text, MLBox.textColor);
+    MCBox.box.texture = renderText(r, MCBox.font, MCBox.text, MCBox.textColor);
+    MRBox.box.texture = renderText(r, MRBox.font, MRBox.text, MRBox.textColor);
+    AMLBox.box.texture = renderText(r, AMLBox.font, AMLBox.text, AMLBox.textColor);
+    AMCBox.box.texture = renderText(r, AMCBox.font, AMCBox.text, AMCBox.textColor);
+    AMRBox.box.texture = renderText(r, AMRBox.font, AMRBox.text, AMRBox.textColor);
+    STBox.box.texture = renderText(r, STBox.font, STBox.text, STBox.textColor);
+
+    // Additional Data Fields
+
+    nameBox.box.texture = renderText(r, nameBox.font, nameBox.text, nameBox.textColor);
+    where_positionBox.box.texture = renderText(r, where_positionBox.font, where_positionBox.text, where_positionBox.textColor);
+    ageBox.box.texture = renderText(r, ageBox.font, ageBox.text, ageBox.textColor);
+    caBox.box.texture = renderText(r, caBox.font, caBox.text, caBox.textColor);
+    paBox.box.texture = renderText(r, paBox.font, paBox.text, paBox.textColor);
+    nationalityBox.box.texture = renderText(r, nationalityBox.font, nationalityBox.text, nationalityBox.textColor);
+    clubBox.box.texture = renderText(r, clubBox.font, clubBox.text, clubBox.textColor);
+    heightBox.box.texture = renderText(r, heightBox.font, heightBox.text, heightBox.textColor);
+    weightBox.box.texture = renderText(r, weightBox.font, weightBox.text, weightBox.textColor);
+    leftBox.box.texture = renderText(r, leftBox.font, leftBox.text, leftBox.textColor);
+    rightBox.box.texture = renderText(r, rightBox.font, rightBox.text, rightBox.textColor);
+    valuesBox.box.texture = renderText(r, valuesBox.font, valuesBox.text, valuesBox.textColor);
+    currentReputationBox.box.texture = renderText(r, currentReputationBox.font, currentReputationBox.text, currentReputationBox.textColor);
+    domesticReputationBox.box.texture = renderText(r, domesticReputationBox.font, domesticReputationBox.text, domesticReputationBox.textColor);
+    worldReputationBox.box.texture = renderText(r, worldReputationBox.font, worldReputationBox.text, worldReputationBox.textColor);
+    RCABBox.box.texture = renderText(r, RCABBox.font, RCABBox.text, RCABBox.textColor);
+    birthBox.box.texture = renderText(r, birthBox.font, birthBox.text, birthBox.textColor);
+    numberOfNationalTeamAppearanceBox.box.texture = renderText(r, numberOfNationalTeamAppearanceBox.font, numberOfNationalTeamAppearanceBox.text, numberOfNationalTeamAppearanceBox.textColor);
+    goalsScoredForNationalTeamBox.box.texture = renderText(r, goalsScoredForNationalTeamBox.font, goalsScoredForNationalTeamBox.text, goalsScoredForNationalTeamBox.textColor);
+    salaryBox.box.texture = renderText(r, salaryBox.font, salaryBox.text, salaryBox.textColor);
+    UIDBox.box.texture = renderText(r, UIDBox.font, UIDBox.text, UIDBox.textColor);
+
 
     name.box.texture = renderText(r,name.font,name.text,name.textColor);
     birth.box.texture = renderText(r,birth.font,birth.text,name.textColor);
@@ -894,12 +1053,34 @@ void player_data_screen(SDL_Renderer* r, SDL_Event* e, Fonts* fonts, Circularlis
         SDL_SetRenderDrawColor(r, 255,255,255,255);
         SDL_RenderClear(r);
         renderBox(r,data_box.rect,data_box.background_color);
+        renderBox(r,blue_box.rect,blue_box.background_color);
+        renderButton(r, cornersBox); renderButton(r, crossingBox); renderButton(r, dribblingBox); renderButton(r, finishingBox);
+        renderButton(r, firstTouchBox); renderButton(r, freeKickTakingBox); renderButton(r, headingBox); renderButton(r, longShotBox); renderButton(r, longThrowsBox);
+        renderButton(r, markingBox); renderButton(r, passingBox); renderButton(r, penaltyTakingBox); renderButton(r, tacklingBox); renderButton(r, techniqueBox);
+        renderButton(r, aggressionBox); renderButton(r, anticipationBox); renderButton(r, braveryBox); renderButton(r, composureBox); renderButton(r, concentrationBox);
+        renderButton(r, visionBox); renderButton(r, decisionBox); renderButton(r, determinationBox); renderButton(r, flairBox); renderButton(r, leadershipBox);
+        renderButton(r, offTheBallBox); renderButton(r, positionBox); renderButton(r, teamworkBox); renderButton(r, workRateBox); renderButton(r, accelerationBox);
+        renderButton(r, agilityBox); renderButton(r, balanceBox); renderButton(r, jumpingReachBox); renderButton(r, naturalFitnessBox); renderButton(r, paceBox);
+        renderButton(r, staminaBox); renderButton(r, strengthBox); renderButton(r, stabilityBox); renderButton(r, foulBox); renderButton(r, contestPerformanceBox);
+        renderButton(r, injuryBox); renderButton(r, diversityBox); renderButton(r, aerialReachBox); renderButton(r, commandOfAreaBox);renderButton(r, communicationBox);
+        renderButton(r, eccentricityBox); renderButton(r, handlingBox); renderButton(r, kickingBox); renderButton(r, oneOnOnesBox); renderButton(r, reflexesBox);
+        renderButton(r, rushingOutBox); renderButton(r, throwingBox); renderButton(r, adaptationBox); renderButton(r, ambitionBox); renderButton(r, argueBox);
+        renderButton(r, loyalBox); renderButton(r, professionalBox); renderButton(r, sportmanshipBox); renderButton(r, emotionalControlBox); renderButton(r, punchingBox);
+        renderButton(r, resistantToStressBox);
 
-        renderButton(r, numIdBox); renderButton(r, IdBox);
-        renderButton(r, nameBox); renderButton(r, birthBox); renderButton(r, ageBox); renderButton(r, nationBox); renderButton(r, clubBox);
-        renderButton(r, positionBox); renderButton(r, caBox); renderButton(r, paBox); 
-        renderButton(r, cornersBox); renderButton(r, crossingBox); renderButton(r, dribblingBox); renderButton(r, finishingBox); renderButton(r, first_touchBox);
-        renderButton(r, free_kick_takingBox); renderButton(r, headingBox); renderButton(r, long_shotBox); renderButton(r, long_throwsBox); renderButton(r, markingBox);
+        // Position Boxes
+        // renderButton(r, GKBox); renderButton(r, DLBox); renderButton(r, DCBox); renderButton(r, DRBox); renderButton(r, WBLBox);
+        // renderButton(r, WBRBox); renderButton(r, DMBox); renderButton(r, MLBox); renderButton(r, MCBox); renderButton(r, MRBox);
+        // renderButton(r, AMLBox); renderButton(r, AMCBox); renderButton(r, AMRBox); renderButton(r, STBox);
+
+        // Additional Data Fields
+        renderButton(r,IdBox);
+        renderButton(r, numIdBox); renderButton(r, nameBox); renderButton(r, where_positionBox); renderButton(r, ageBox); renderButton(r, caBox);
+        renderButton(r, paBox); renderButton(r, nationalityBox); renderButton(r, clubBox); renderButton(r, heightBox); renderButton(r, weightBox);
+        renderButton(r, leftBox); renderButton(r, rightBox); renderButton(r, valuesBox); renderButton(r, currentReputationBox); renderButton(r, domesticReputationBox);
+        renderButton(r, worldReputationBox); renderButton(r, RCABBox); renderButton(r, birthBox); renderButton(r, numberOfNationalTeamAppearanceBox); renderButton(r, goalsScoredForNationalTeamBox);
+        renderButton(r, salaryBox); renderButton(r, UIDBox);
+
 
         renderButton(r, name); renderButton(r, birth); renderButton(r, age); renderButton(r, nation); renderButton(r, club); 
         renderButton(r, position); renderButton(r, ca); renderButton(r, pa);
@@ -919,7 +1100,7 @@ void player_data_screen(SDL_Renderer* r, SDL_Event* e, Fonts* fonts, Circularlis
 //선수 찾기
 
 int main() {
-    int w = 1280;
+    int w = 1480;
     int h = 800;
     if (SDL_Init(SDL_INIT_VIDEO) != 0) {
         logSDLError("SDL_Init");
