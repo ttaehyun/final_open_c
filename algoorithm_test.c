@@ -454,14 +454,300 @@ void findStrikers(Circularlist* player_list,Circularlist* search_list, int* idCo
     while (current != player_list->head);
 }
 
+void findWingers(Circularlist* player_list,Circularlist* search_list, int* idCounter) {
+    if (player_list->head == NULL) {
+        printf("List is empty\n");
+        return;
+    }
+
+    Node* current = player_list->head;
+    do {
+        Player p = current->player;
+        // 평균 계산
+        float avg1 = (p.ability_stat.acceleration + p.ability_stat.pace) / 2.0;
+        float avg2 = p.ability_stat.stamina;
+        float avg3 = p.ability_stat.agility;
+        float avg5 = (p.ability_stat.decision + p.ability_stat.crossing + p.ability_stat.dribbling + p.ability_stat.first_touch) / 4.0;
+        float avg6 = p.ability_stat.technique;
+        float avg7 = (p.ability_stat.anticipation + p.ability_stat.composure + p.ability_stat.vision + p.ability_stat.work_rate + p.ability_stat.strength) / 5.0;
+        float avg8 = (p.ability_stat.concentration + p.ability_stat.off_the_ball + p.ability_stat.teamwork + p.ability_stat.balance + p.ability_stat.finishing + p.ability_stat.long_shot + p.ability_stat.passing + p.ability_stat.tackling) / 8.0;
+        float avg9 = (p.ability_stat.bravery + p.ability_stat.leadership + p.ability_stat.position + p.ability_stat.jumping_reach + p.ability_stat.heading + p.ability_stat.marking) / 6.0;
+
+        // 평균 기준 만족 검사
+        if (avg1 >= 13 && avg2 >= 13 && avg3 >= 12 && avg5 >= 12 &&
+            avg6 >= 12 && avg7 >= 11 && avg8 >= 11 && avg9 >= 10) {
+            appendNode(search_list,p,idCounter);
+        }
+
+        current = current->next;
+    }
+    while (current != player_list->head);
+}
+void findWideMidfielders(Circularlist* player_list,Circularlist* search_list, int* idCounter) {
+    if (player_list->head == NULL) {
+        printf("List is empty\n");
+        return;
+    }
+
+    Node* current = player_list->head;
+		do {
+        Player p = current->player;
+        // 평균 계산
+        float avg1 = p.ability_stat.acceleration; // 1순위
+        float avg2 = (p.ability_stat.agility + p.ability_stat.pace) / 2.0; // 2순위
+        float avg3 = (p.ability_stat.decision + p.ability_stat.stamina + p.ability_stat.crossing) / 3.0; // 3순위
+        float avg4 = (p.ability_stat.first_touch + p.ability_stat.technique) / 2.0; // 4순위
+        float avg5 = (p.ability_stat.anticipation + p.ability_stat.composure + p.ability_stat.vision +
+                      p.ability_stat.work_rate + p.ability_stat.strength + p.ability_stat.dribbling +
+                      p.ability_stat.passing) / 7.0; // 5순위
+        float avg6 = (p.ability_stat.concentration + p.ability_stat.off_the_ball + p.ability_stat.teamwork +
+                      p.ability_stat.balance + p.ability_stat.finishing + p.ability_stat.long_shot +
+                      p.ability_stat.tackling) / 7.0; // 6순위
+        float avg7 = (p.ability_stat.bravery + p.ability_stat.leadership + p.ability_stat.position +
+                      p.ability_stat.jumping_reach + p.ability_stat.heading + p.ability_stat.marking) / 6.0; // 7순위
+
+        // 평균 기준 만족 검사
+        if (avg1 >= 13 && avg2 >= 13 && avg3 >= 12 && avg4 >= 12 &&
+            avg5 >= 12 && avg6 >= 11 && avg7 >= 11) {
+            appendNode(search_list,p,idCounter);
+        }
+
+        current = current->next;
+    }
+    while (current != player_list->head); 
+}
+void findCentralMidfielders(Circularlist* player_list,Circularlist* search_list, int* idCounter) {
+    if (player_list->head == NULL) {
+        printf("List is empty\n");
+        return;
+    }
+
+    Node* current = player_list->head;
+		do {
+        Player p = current->player;
+        // 평균 계산
+        float avg1 = p.ability_stat.decision; // 1순위
+        float avg2 = (p.ability_stat.vision + p.ability_stat.acceleration + p.ability_stat.agility +
+                      p.ability_stat.stamina + p.ability_stat.first_touch + p.ability_stat.passing) / 6.0; // 2순위
+        float avg3 = p.ability_stat.pace; // 3순위
+        float avg4 = (p.ability_stat.strength + p.ability_stat.technique) / 2.0; // 4순위
+        float avg5 = (p.ability_stat.anticipation + p.ability_stat.composure + p.ability_stat.off_the_ball +
+                      p.ability_stat.position + p.ability_stat.work_rate + p.ability_stat.long_shot +
+                      p.ability_stat.marking + p.ability_stat.tackling) / 8.0; // 5순위
+        float avg6 = (p.ability_stat.concentration + p.ability_stat.teamwork + p.ability_stat.balance +
+                      p.ability_stat.dribbling + p.ability_stat.finishing) / 5.0; // 6순위
+        float avg7 = (p.ability_stat.bravery + p.ability_stat.leadership + p.ability_stat.jumping_reach +
+                      p.ability_stat.crossing + p.ability_stat.heading) / 5.0; // 7순위
+
+        // 평균 기준 만족 검사
+        if (avg1 >= 13 && avg2 >= 13 && avg3 >= 12 && avg4 >= 12 &&
+            avg5 >= 12 && avg6 >= 11 && avg7 >= 11) {
+            appendNode(search_list,p,idCounter);
+        }
+
+        current = current->next;
+    }
+    while (current != player_list->head);   
+}
+void findAttackingMidfielders(Circularlist* player_list,Circularlist* search_list, int* idCounter) {
+    if (player_list->head == NULL) {
+        printf("List is empty\n");
+        return;
+    }
+
+    Node* current = player_list->head;
+		do {
+        Player p = current->player;
+        // 평균 계산
+        float avg1 = p.ability_stat.acceleration; // 1순위
+        float avg2 = p.ability_stat.pace; // 2순위
+        float avg3 = (p.ability_stat.decision + p.ability_stat.vision + p.ability_stat.agility + p.ability_stat.stamina) / 4.0; // 3순위
+        float avg4 = (p.ability_stat.first_touch + p.ability_stat.technique) / 2.0; // 4순위
+        float avg5 = p.ability_stat.passing; // 5순위
+        float avg6 = (p.ability_stat.anticipation + p.ability_stat.composure + p.ability_stat.off_the_ball +
+                      p.ability_stat.work_rate + p.ability_stat.strength + p.ability_stat.dribbling +
+                      p.ability_stat.finishing + p.ability_stat.long_shot) / 8.0; // 6순위
+        float avg7 = (p.ability_stat.concentration + p.ability_stat.position + p.ability_stat.teamwork +
+                      p.ability_stat.balance + p.ability_stat.tackling) / 5.0; // 7순위
+        float avg8 = (p.ability_stat.bravery + p.ability_stat.leadership + p.ability_stat.jumping_reach +
+                      p.ability_stat.crossing + p.ability_stat.heading + p.ability_stat.marking) / 6.0; // 8순위
+
+        // 평균 기준 만족 검사
+        if (avg1 >= 13 && avg2 >= 13 && avg3 >= 12 && avg4 >= 12 &&
+            avg5 >= 12 && avg6 >= 11 && avg7 >= 11 && avg8 >= 10) {
+            appendNode(search_list,p,idCounter);
+        }
+
+        current = current->next;
+    }
+    while (current != player_list->head);  
+}
+void findDefensiveMidfielders(Circularlist* player_list,Circularlist* search_list, int* idCounter) {
+    if (player_list->head == NULL) {
+        printf("List is empty\n");
+        return;
+    }
+
+    Node* current = player_list->head;
+		do {
+        Player p = current->player;
+        // 평균 계산
+        float avg1 = p.ability_stat.decision; // 1 순위
+        float avg2 = p.ability_stat.tackling; // 2 순위
+        float avg3 = (p.ability_stat.acceleration + p.ability_stat.agility) / 2.0; // 3 순위
+        float avg4 = (p.ability_stat.anticipation + p.ability_stat.position + p.ability_stat.strength) / 3.0; // 4 순위
+        float avg5 = (p.ability_stat.vision + p.ability_stat.work_rate + p.ability_stat.pace + p.ability_stat.stamina + p.ability_stat.first_touch + p.ability_stat.passing) / 6.0; // 5 순위
+        float avg6 = (p.ability_stat.concentration + p.ability_stat.marking + p.ability_stat.long_shot + p.ability_stat.technique) / 4.0; // 6 순위
+        float avg7 = (p.ability_stat.composure + p.ability_stat.teamwork + p.ability_stat.balance + p.ability_stat.dribbling + p.ability_stat.finishing) / 5.0; // 7 순위
+        float avg8 = (p.ability_stat.bravery + p.ability_stat.leadership + p.ability_stat.off_the_ball + p.ability_stat.jumping_reach + p.ability_stat.crossing + p.ability_stat.heading) / 6.0; // 8 순위
+
+        // 평균 기준 만족 검사
+        if (avg1 >= 13 && avg2 >= 13 && avg3 >= 12 && avg4 >= 12 &&
+            avg5 >= 12 && avg6 >= 11 && avg7 >= 11 && avg8 >= 10) {
+            appendNode(search_list,p,idCounter);
+        }
+
+        current = current->next;
+    }
+    while (current != player_list->head);
+}
+void findFullbacks(Circularlist* player_list,Circularlist* search_list, int* idCounter) {
+    if (player_list->head == NULL) {
+        printf("List is empty\n");
+        return;
+    }
+
+    Node* current = player_list->head;
+		do {
+        Player p = current->player;
+        // 평균 계산
+        float avg1 = (p.ability_stat.decision + p.ability_stat.acceleration) / 2.0; // 1순위
+        float avg2 = (p.ability_stat.agility + p.ability_stat.stamina) / 2.0; // 2순위
+        float avg3 = p.ability_stat.pace; // 3순위
+        float avg4 = (p.ability_stat.concentration + p.ability_stat.position + p.ability_stat.strength + p.ability_stat.tackling) / 4.0; // 4순위
+        float avg5 = (p.ability_stat.anticipation + p.ability_stat.first_touch + p.ability_stat.marking) / 3.0; // 5순위
+        float avg6 = (p.ability_stat.bravery + p.ability_stat.composure + p.ability_stat.teamwork + p.ability_stat.vision +
+                      p.ability_stat.work_rate + p.ability_stat.balance + p.ability_stat.jumping_reach + p.ability_stat.crossing +
+                      p.ability_stat.heading + p.ability_stat.passing + p.ability_stat.technique) / 11.0; // 6순위
+        float avg7 = (p.ability_stat.leadership + p.ability_stat.off_the_ball + p.ability_stat.dribbling +
+                      p.ability_stat.finishing + p.ability_stat.long_shot) / 5.0; // 7순위
+
+        // 평균 기준 만족 검사
+        if (avg1 >= 13 && avg2 >= 13 && avg3 >= 12 && avg4 >= 12 &&
+            avg5 >= 12 && avg6 >= 11 && avg7 >= 11) {
+            appendNode(search_list,p,idCounter);
+        }
+
+        current = current->next;
+    }
+    while (current != player_list->head);   
+}
+void findWingBacks(Circularlist* player_list,Circularlist* search_list, int* idCounter) {
+    if (player_list->head == NULL) {
+        printf("List is empty\n");
+        return;
+    }
+
+    Node* current = player_list->head;
+		do {
+        Player p = current->player;
+        // 평균 계산
+        float avg1 = p.ability_stat.acceleration; // 1순위
+        float avg2 = p.ability_stat.stamina; // 2순위
+        float avg3 = p.ability_stat.pace; // 3순위
+        float avg4 = (p.ability_stat.decision + p.ability_stat.agility) / 2.0; // 4순위
+        float avg5 = p.ability_stat.strength; // 5순위
+        float avg6 = (p.ability_stat.anticipation + p.ability_stat.concentration + p.ability_stat.position +
+                      p.ability_stat.crossing + p.ability_stat.first_touch + p.ability_stat.passing +
+                      p.ability_stat.tackling + p.ability_stat.technique) / 8.0; // 6순위
+        float avg7 = (p.ability_stat.composure + p.ability_stat.off_the_ball + p.ability_stat.teamwork +
+                      p.ability_stat.vision + p.ability_stat.work_rate + p.ability_stat.balance +
+                      p.ability_stat.dribbling + p.ability_stat.marking) / 8.0; // 7순위
+        float avg8 = (p.ability_stat.bravery + p.ability_stat.leadership + p.ability_stat.jumping_reach +
+                      p.ability_stat.finishing + p.ability_stat.heading + p.ability_stat.long_shot) / 6.0; // 8순위
+
+        // 평균 기준 만족 검사
+        if (avg1 >= 13 && avg2 >= 13 && avg3 >= 12 && avg4 >= 12 &&
+            avg5 >= 12 && avg6 >= 11 && avg7 >= 11 && avg8 >= 10) {
+            appendNode(search_list,p,idCounter);
+        }
+
+        current = current->next;
+    }
+    while (current != player_list->head);
+}
+void findCenterBacks(Circularlist* player_list,Circularlist* search_list, int* idCounter) {
+    if (player_list->head == NULL) {
+        printf("List is empty\n");
+        return;
+    }
+
+    Node* current = player_list->head;
+		do {
+        Player p = current->player;
+        // 평균 계산
+        float avg1 = p.ability_stat.decision; // 1순위
+        float avg2 = (p.ability_stat.position + p.ability_stat.marking) / 2.0; // 2순위
+        float avg3 = (p.ability_stat.acceleration + p.ability_stat.agility + p.ability_stat.jumping_reach + p.ability_stat.strength) / 4.0; // 3순위
+        float avg4 = (p.ability_stat.anticipation + p.ability_stat.pace + p.ability_stat.heading + p.ability_stat.tackling) / 4.0; // 4순위
+        float avg6 = p.ability_stat.concentration; // 6순위
+        float avg7 = p.ability_stat.stamina; // 7순위
+        float avg8 = (p.ability_stat.bravery + p.ability_stat.leadership + p.ability_stat.composure +
+                      p.ability_stat.work_rate + p.ability_stat.balance + p.ability_stat.first_touch +
+                      p.ability_stat.passing) / 7.0; // 8순위
+        float avg9 = (p.ability_stat.off_the_ball + p.ability_stat.teamwork + p.ability_stat.vision +
+                      p.ability_stat.crossing + p.ability_stat.dribbling + p.ability_stat.finishing +
+                      p.ability_stat.long_shot + p.ability_stat.technique) / 8.0; // 9순위
+
+        // 평균 기준 만족 검사
+        if (avg1 >= 13 && avg2 >= 13 && avg3 >= 12 && avg4 >= 12 &&
+            avg6 >= 12 && avg7 >= 11 && avg8 >= 11 && avg9 >= 10) {
+            appendNode(search_list,p,idCounter);
+        }
+
+        current = current->next;
+    }
+    while (current != player_list->head); 
+}
+void findGoalkeepers(Circularlist* player_list,Circularlist* search_list, int* idCounter) {
+    if (player_list->head == NULL) {
+        printf("List is empty\n");
+        return;
+    }
+
+    Node* current = player_list->head;
+		do {
+        Player p = current->player;
+        // 평균 계산
+        float avg1 = p.ability_stat.decision; // 1 순위
+        float avg2 = (p.ability_stat.handling + p.ability_stat.reflexes + p.ability_stat.agility) / 3.0; // 2 순위
+        float avg3 = (p.ability_stat.aerial_reach + p.ability_stat.command_of_area + p.ability_stat.concentration +
+                      p.ability_stat.bravery + p.ability_stat.acceleration) / 5.0; // 3 순위
+        float avg4 = (p.ability_stat.communication + p.ability_stat.kicking + p.ability_stat.position) / 3.0; // 4 순위
+        float avg5 = (p.ability_stat.one_on_ones + p.ability_stat.strength) / 2.0; // 5 순위
+        float avg6 = (p.ability_stat.throwing + p.ability_stat.anticipation + p.ability_stat.pace + p.ability_stat.passing) / 4.0; // 6 순위
+        float avg7 = (p.ability_stat.composure + p.ability_stat.leadership + p.ability_stat.teamwork + p.ability_stat.balance) / 4.0; // 7 순위
+        float avg8 = (p.ability_stat.heading + p.ability_stat.first_touch + p.ability_stat.technique + p.ability_stat.vision +
+                      p.ability_stat.work_rate + p.ability_stat.jumping_reach + p.ability_stat.stamina) / 7.0; // 8 순위
+
+        // 평균 기준 만족 검사
+        if (avg1 >= 13 && avg2 >= 13 && avg3 >= 12 && avg4 >= 12 &&
+            avg5 >= 12 && avg6 >= 11 && avg7 >= 11 && avg8 >= 10) {
+            appendNode(search_list,p,idCounter);
+        }
+
+        current = current->next;
+    }
+    while (current != player_list->head);
+}
 void startMain(SDL_Renderer* r, SDL_Event* e,Fonts* fonts) {
     SDL_Color textColor = {0,0,0,255};
     SDL_Color box_color = {255,255,255,255};
     SDL_Color button_color = {200,100,150,255};
     SDL_Color button_hover_color = {200,200,150,255};
 
-    Button titleBox = {{{490, 300, 300, 150},box_color,NULL},textColor,"Football Agency", fonts->font60};
-    Button startButton = {{{550,500,200, 80},button_color,NULL}, textColor,"Start",fonts->font40};
+    Button titleBox = {{{590, 300, 300, 150},box_color,NULL},textColor,"Football Agency", fonts->font60};
+    Button startButton = {{{640,500,200, 80},button_color,NULL}, textColor,"Start",fonts->font40};
 
     titleBox.box.texture = renderText(r,titleBox.font,titleBox.text,titleBox.textColor);
     startButton.box.texture = renderText(r, startButton.font, startButton.text, startButton.textColor);
@@ -507,30 +793,47 @@ void startMain(SDL_Renderer* r, SDL_Event* e,Fonts* fonts) {
     SDL_DestroyTexture(startButton.box.texture);
 }
 
-void where_position_recommended_screen(SDL_Renderer* r, SDL_Event* e, Fonts* fonts) {
+void where_position_recommended_screen(SDL_Renderer* r, SDL_Event* e, Fonts* fonts,int* what_choice) {
     SDL_Color textColor = {0,0,0,255};
     SDL_Color box_color = {255,255,255,255};
     SDL_Color button_color = {200,100,150,255};
     SDL_Color button_hover_color = {200,200,150,255};
 
-    Button attackerButton = {{{500,100, 300,100},box_color,NULL},textColor,"Attacker",fonts->font40};
-    Button midfielderButton = {{{500,250,300,100},box_color,NULL},textColor,"Midfielder",fonts->font40};
-    Button defenderButton = {{{500,400,300,100},box_color,NULL},textColor,"Defender",fonts->font40};
-    Button goalkeeperButton = {{{500,550,300,100},box_color,NULL},textColor,"GoalKeeper",fonts->font40};
+    Button attackerButton = {{{600,100, 300,100},box_color,NULL},textColor,"Attacker",fonts->font40};
+    Button midfielderButton = {{{600,250,300,100},box_color,NULL},textColor,"Midfielder",fonts->font40};
+    Button defenderButton = {{{600,400,300,100},box_color,NULL},textColor,"Defender",fonts->font40};
+    Button goalkeeperButton = {{{600,550,300,100},box_color,NULL},textColor,"GoalKeeper",fonts->font40};
+
+    Button striker = {{{600,250, 300,100},box_color,NULL},textColor,"Striker",fonts->font40};
+    Button winger = {{{600,400, 300,100},box_color,NULL},textColor,"Winger",fonts->font40};
+
+    Button wideMid = {{{600,100, 300,100},box_color,NULL},textColor,"WideMidfielder",fonts->font40};
+    Button centralMid = {{{600,250, 300,100},box_color,NULL},textColor,"CentralMidfielder",fonts->font40};
+    Button attackMid = {{{600,400, 300,100},box_color,NULL},textColor,"AttackingMidfielder",fonts->font40};
+    Button defenseMid = {{{600,550, 300,100},box_color,NULL},textColor,"DefenseMidfielder",fonts->font40};
+
+    Button fullback = {{{600,200, 300,100},box_color,NULL},textColor,"Fullback",fonts->font40};
+    Button wingback = {{{600,400, 300,100},box_color,NULL},textColor,"Wingback",fonts->font40};
+    Button centerback = {{{600,600, 300,100},box_color,NULL},textColor,"Centerback",fonts->font40};
 
     attackerButton.box.texture = renderText(r,attackerButton.font,attackerButton.text,attackerButton.textColor);
     midfielderButton.box.texture = renderText(r,midfielderButton.font,midfielderButton.text,midfielderButton.textColor);
     defenderButton.box.texture = renderText(r,defenderButton.font,defenderButton.text,defenderButton.textColor);
     goalkeeperButton.box.texture = renderText(r,goalkeeperButton.font,goalkeeperButton.text,goalkeeperButton.textColor);
 
-    if(attackerButton.box.texture == NULL || midfielderButton.box.texture == NULL || \
-        defenderButton.box.texture == NULL || goalkeeperButton.box.texture == NULL) {
-        SDL_DestroyTexture(attackerButton.box.texture);   
-        SDL_DestroyTexture(midfielderButton.box.texture);
-        SDL_DestroyTexture(defenderButton.box.texture);
-        SDL_DestroyTexture(goalkeeperButton.box.texture);
-    }
-    bool quit = false;
+    striker.box.texture = renderText(r, striker.font, striker.text, striker.textColor);
+    winger.box.texture = renderText(r, winger.font, winger.text, winger.textColor);
+
+    wideMid.box.texture = renderText(r, wideMid.font, wideMid.text, wideMid.textColor);
+    centralMid.box.texture = renderText(r, centralMid.font, centralMid.text, centralMid.textColor);
+    attackMid.box.texture = renderText(r, attackMid.font, attackMid.text, attackMid.textColor);
+    defenseMid.box.texture = renderText(r, defenseMid.font, defenseMid.text, defenseMid.textColor);
+
+    fullback.box.texture = renderText(r, fullback.font, fullback.text, fullback.textColor);
+    wingback.box.texture = renderText(r, wingback.font, wingback.text, wingback.textColor);
+    centerback.box.texture = renderText(r, centerback.font, centerback.text, centerback.textColor);
+
+    bool quit = false; bool button_click = false; bool attacker = false; bool midfielder = false; bool defense = false; bool goalkeep = false;
     while(!quit) {
         while(SDL_PollEvent(e)) {
             if (e->type == SDL_KEYDOWN) {
@@ -544,18 +847,81 @@ void where_position_recommended_screen(SDL_Renderer* r, SDL_Event* e, Fonts* fon
             else if (e->type == SDL_MOUSEBUTTONDOWN) {
                 int x, y;
                 SDL_GetMouseState(&x, &y);
-                if (isMouseOverButton(attackerButton, x, y)) {
-                    printf("attacker button clicked\n");
-                    quit = true;
+                if (!button_click) {
+                    if (isMouseOverButton(attackerButton, x, y)) {
+                    
+                        attacker = true;
+                        button_click = true;
+                        
+                    }
+                    else if (isMouseOverButton(midfielderButton,x,y)) {
+                    
+                        midfielder = true;
+                        button_click = true;
+                    
+                    } 
+                    else if (isMouseOverButton(defenderButton,x,y)) {
+                        defense = true;
+                        button_click = true;
+                    }
+                    else if (isMouseOverButton(goalkeeperButton, x, y)) {
+                        *what_choice = 9;
+                        quit = true;
+                    }
                 }
-                else if (isMouseOverButton(midfielderButton,x,y)) {
-                    printf("mid button");
-                } 
-                else if (isMouseOverButton(defenderButton,x,y)) {
-                    printf("defend button");
+                if (isMouseOverButton(striker, x, y)) {
+                    if (attacker) {
+                        *what_choice = 0;
+                        quit = true;
+                    }
                 }
-                else if (isMouseOverButton(goalkeeperButton, x, y)) {
-                    printf("goal button");
+                else if (isMouseOverButton(winger,x,y)) {
+                    if (attacker) {
+                        *what_choice = 1;
+                        quit = true;
+                    }
+                }
+                else if (isMouseOverButton(wideMid, x, y)) {
+                    if (midfielder) {
+                        *what_choice = 2;
+                        quit = true;
+                    }
+                }
+                else if (isMouseOverButton(centralMid, x, y)) {
+                    if (midfielder) {
+                        *what_choice = 3;
+                        quit = true;
+                    }
+                }
+                else if (isMouseOverButton(attackMid, x, y)) {
+                    if (midfielder) {
+                        *what_choice = 4;
+                        quit = true;
+                    }
+                }
+                else if (isMouseOverButton(defenseMid, x, y)) {
+                    if (midfielder) {
+                        *what_choice = 5;
+                        quit = true;
+                    }
+                }
+                else if (isMouseOverButton(fullback, x, y)) {
+                    if (defense) {
+                        *what_choice = 6;
+                        quit = true;
+                    }
+                }
+                else if (isMouseOverButton(wingback, x, y)) {
+                    if (defense) {
+                        *what_choice = 7;
+                        quit = true;
+                    }
+                }
+                else if (isMouseOverButton(centerback, x, y)) {
+                    if (defense) {
+                        *what_choice = 8;
+                        quit = true;
+                    }
                 }
             }
         }
@@ -581,18 +947,87 @@ void where_position_recommended_screen(SDL_Renderer* r, SDL_Event* e, Fonts* fon
         } else {
             goalkeeperButton.box.background_color = button_color;
         }
+        if (isMouseOverButton(striker, x,y)) {
+            striker.box.background_color = button_hover_color;
+        } else {
+            striker.box.background_color = button_color;
+        }
+        if (isMouseOverButton(winger, x, y)) {
+            winger.box.background_color = button_hover_color;
+        } else {
+            winger.box.background_color = button_color;
+        }
+        if (isMouseOverButton(wideMid, x, y)) {
+            wideMid.box.background_color = button_hover_color;
+        } else {
+            wideMid.box.background_color = button_color;
+        }
+        if (isMouseOverButton(centralMid, x, y)) {
+            centralMid.box.background_color = button_hover_color;
+        } else {
+            centralMid.box.background_color = button_color;
+        }
+        if (isMouseOverButton(attackMid, x, y)) {
+            attackMid.box.background_color = button_hover_color;
+        } else {
+            attackMid.box.background_color = button_color;
+        }
+        if (isMouseOverButton(defenseMid, x, y)) {
+            defenseMid.box.background_color = button_hover_color;
+        } else {
+            defenseMid.box.background_color = button_color;
+        }
+        if (isMouseOverButton(fullback, x, y)) {
+            fullback.box.background_color = button_hover_color;
+        } else {
+            fullback.box.background_color = button_color;
+        }
+        if (isMouseOverButton(wingback, x, y)) {
+            wingback.box.background_color = button_hover_color;
+        } else {
+            wingback.box.background_color = button_color;
+        }
+        if (isMouseOverButton(centerback, x, y)) {
+            centerback.box.background_color = button_hover_color;
+        } else {
+            centerback.box.background_color = button_color;
+        }
+
         SDL_SetRenderDrawColor(r, 255,255,255,255);
         SDL_RenderClear(r);
-        renderButton(r, attackerButton);
-        renderButton(r, midfielderButton);
-        renderButton(r, defenderButton);
-        renderButton(r, goalkeeperButton);
+        if (attacker) {
+            SDL_RenderClear(r);
+            renderButton(r, striker);
+            renderButton(r, winger);
+        }
+        
+        if (midfielder) {
+            SDL_RenderClear(r);
+            renderButton(r,wideMid);
+            renderButton(r, centralMid);
+            renderButton(r, attackMid);
+            renderButton(r, defenseMid);
+        }
+        
+        if (defense) {
+            SDL_RenderClear(r);
+            renderButton(r, fullback);
+            renderButton(r, wingback);
+            renderButton(r, centerback);
+        }
+        
+        if (!button_click) {
+            renderButton(r, attackerButton);
+            renderButton(r, midfielderButton);
+            renderButton(r, defenderButton);
+            renderButton(r, goalkeeperButton);
+        }
         SDL_RenderPresent(r);
     }
-    SDL_DestroyTexture(attackerButton.box.texture);   
-    SDL_DestroyTexture(midfielderButton.box.texture);
-    SDL_DestroyTexture(defenderButton.box.texture);
-    SDL_DestroyTexture(goalkeeperButton.box.texture);
+    SDL_DestroyTexture(attackerButton.box.texture); SDL_DestroyTexture(midfielderButton.box.texture); SDL_DestroyTexture(defenderButton.box.texture); SDL_DestroyTexture(goalkeeperButton.box.texture);
+    SDL_DestroyTexture(striker.box.texture); SDL_DestroyTexture(winger.box.texture); SDL_DestroyTexture(wideMid.box.texture); SDL_DestroyTexture(centralMid.box.texture);
+    SDL_DestroyTexture(attackMid.box.texture); SDL_DestroyTexture(defenseMid.box.texture); SDL_DestroyTexture(fullback.box.texture); SDL_DestroyTexture(wingback.box.texture);
+    SDL_DestroyTexture(wingback.box.texture); SDL_DestroyTexture(centerback.box.texture); 
 }
 char* to_char(int num) {
     // 버퍼 크기를 충분히 크게 설정합니다.
@@ -1881,17 +2316,49 @@ int main() {
     Circularlist search_list;
     initList(&player_list);
     initList(&search_list);
+
     int all_idCounter = 1;
     int search_idCounter = 1;
+    int what_choice;
     readCSV("FM2023.csv", &player_list, &all_idCounter);
     //searchPlayer(&player_list, &search_list);
-    findStrikers(&player_list, &search_list, &search_idCounter);
+    
     //printList(&search_list);
     
 
     SDL_Event e;
-    //startMain(renderer,&e,&font_collection);
-    //where_position_recommended_screen(renderer,&e,&font_collection);
+    startMain(renderer,&e,&font_collection);
+    where_position_recommended_screen(renderer,&e,&font_collection, &what_choice);
+    if (what_choice == 0) {
+        findStrikers(&player_list, &search_list, &search_idCounter);
+    }
+    else if (what_choice == 1) {
+        findWingers(&player_list,&search_list,&search_idCounter);
+    }
+    else if (what_choice == 2) {
+        findWideMidfielders(&player_list,&search_list,&search_idCounter);
+    }
+    else if (what_choice == 3) {
+        findCentralMidfielders(&player_list,&search_list,&search_idCounter);
+    }
+    else if (what_choice == 4) {
+        findAttackingMidfielders(&player_list,&search_list,&search_idCounter);
+    }
+    else if (what_choice == 5) {
+        findDefensiveMidfielders(&player_list,&search_list,&search_idCounter);
+    }
+    else if (what_choice == 6) {
+        findFullbacks(&player_list, &search_list, &search_idCounter);
+    }
+    else if (what_choice == 7) {
+        findWingBacks(&player_list,&search_list, &search_idCounter);
+    }
+    else if (what_choice == 8) {
+        findCenterBacks(&player_list, &search_list, &search_idCounter);
+    }
+    else if (what_choice == 9) {
+        findGoalkeepers(&player_list, &search_list, &search_idCounter);
+    }
     player_data_screen(renderer,&e,&font_collection,&search_list,&search_idCounter);
     
     TTF_CloseFont(font_collection.font10);
