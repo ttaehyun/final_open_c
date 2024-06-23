@@ -6,7 +6,7 @@
 
 - Button 구조체 : Button에 필요한 변수명 모음
 
-- Player 구조체 \n
+- Player 구조체 
   (선수 신체 능력치) (선수 발 능력치) (선수 세부 스탯)
   - 이름
   - 포지션
@@ -26,7 +26,8 @@
   - 급여
   - UID
 
-- 이중 연결 리스트 순환 구조 \n
+- 이중 연결 리스트 순환 구조
+  ``` C
   typedef struct Node {
     Player player;
     int id;
