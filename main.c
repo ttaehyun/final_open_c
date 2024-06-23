@@ -2329,7 +2329,7 @@ int main() {
     if (TTF_Init() == -1) {
         return 0;
     }
-    SDL_Window* window= SDL_CreateWindow("SDL2 Buttons", 10, 10, w, h, SDL_WINDOW_SHOWN);;
+    SDL_Window* window= SDL_CreateWindow("FOOTBALL AGENCY", 10, 10, w, h, SDL_WINDOW_SHOWN);;
     if (window == NULL) {
         logSDLError("SDL_CreateWindow");
         TTF_Quit();
