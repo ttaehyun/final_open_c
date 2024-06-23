@@ -1091,7 +1091,7 @@ char* to_char(int num) {
     return buffer;
 }
 
-void player_data_screen(SDL_Renderer* r, SDL_Event* e, Fonts* fonts, Circularlist* list, int* idCounter) {
+void player_data_screen(SDL_Renderer* r, SDL_Event* e, Fonts* fonts, Circularlist* list, int* idCounter, bool* home_quit) {
     Node* current = list->head;
 
     SDL_Surface* football = IMG_Load("football.jpg");
@@ -1354,9 +1354,11 @@ void player_data_screen(SDL_Renderer* r, SDL_Event* e, Fonts* fonts, Circularlis
 
     Button prevButton = {{{50, 700, 150, 50}, box_color,NULL}, textColor, "Previous", fonts->font20};
     Button nextButton = {{{1280, 700, 150, 50}, box_color,NULL}, textColor, "Next", fonts->font20};
+    Button homeButton = {{{650, 700, 150, 50}, box_color,NULL}, textColor, "HOME", fonts->font20};
 
     numIdBox.box.texture = renderText(r, numIdBox.font, numIdBox.text, numIdBox.textColor);
     IdBox.box.texture = renderText(r, IdBox.font, IdBox.text, IdBox.textColor);
+    
 
     // Assuming renderText is a function that renders text and returns a texture
     // And r is the renderer
@@ -1568,7 +1570,7 @@ void player_data_screen(SDL_Renderer* r, SDL_Event* e, Fonts* fonts, Circularlis
 
     prevButton.box.texture = renderText(r,prevButton.font,prevButton.text,prevButton.textColor);
     nextButton.box.texture = renderText(r, nextButton.font, nextButton.text,nextButton.textColor);
-
+    homeButton.box.texture = renderText(r, homeButton.font, homeButton.text, homeButton.textColor);
 
     bool quit = false;
     while(!quit) {
@@ -1576,15 +1578,21 @@ void player_data_screen(SDL_Renderer* r, SDL_Event* e, Fonts* fonts, Circularlis
             if (e->type == SDL_KEYDOWN) {
                 if (e->key.keysym.sym == SDLK_ESCAPE) {
                     quit = true;
+                    *home_quit = true;
                 }
             }
             else if (e->type == SDL_QUIT) {
                 quit = true;
+                *home_quit = true;
             }
             else if (e->type == SDL_MOUSEBUTTONDOWN) {
                 int x, y;
                 SDL_GetMouseState(&x, &y);
-                if (isMouseOverButton(prevButton, x, y)) {
+                if (isMouseOverButton(homeButton, x, y)) {
+                    quit = true;
+                    *home_quit = false;
+                }
+                else if (isMouseOverButton(prevButton, x, y)) {
                    
                     current = current->prev;
 
@@ -2189,6 +2197,12 @@ void player_data_screen(SDL_Renderer* r, SDL_Event* e, Fonts* fonts, Circularlis
         } else {
             nextButton.box.background_color = button_color;
         }
+        if (isMouseOverButton(homeButton, x, y)) {
+            homeButton.box.background_color = button_hover_color;
+        } else {
+            homeButton.box.background_color = button_color;
+        }
+
         SDL_SetRenderDrawColor(r, 255,255,255,255);
         SDL_RenderClear(r);
         SDL_RenderCopy(r, texture_football, NULL, &football_img);
@@ -2248,7 +2262,7 @@ void player_data_screen(SDL_Renderer* r, SDL_Event* e, Fonts* fonts, Circularlis
         renderButton(r, worldReputation); renderButton(r, RCAB); renderButton(r, birth); renderButton(r, numberOfNationalTeamAppearance); renderButton(r, goalsScoredForNationalTeam);
         renderButton(r, salary); renderButton(r, UID);
 
-        renderButton(r, prevButton); renderButton(r,nextButton);
+        renderButton(r, prevButton); renderButton(r,nextButton); renderButton(r, homeButton);
 
         SDL_RenderPresent(r);
     }
@@ -2363,62 +2377,69 @@ int main() {
     }
     //Node 
     Circularlist player_list;
-    Circularlist search_list;
     initList(&player_list);
-    initList(&search_list);
 
-    int all_idCounter = 1;
-    int search_idCounter = 1;
+    
     int select;
     int what_choice;
+
+    bool home_quit = false;
+
+    int all_idCounter = 1;
     readCSV("FM2023.csv", &player_list, &all_idCounter);
 
     SDL_Event e;
     startMain(renderer,&e,&font_collection);
-    where_position_recommended_screen(renderer,&e,&font_collection, &select);
-    select_position_algorithm(renderer, &e, &font_collection, &select, &what_choice);
+    while(!home_quit) {
+        Circularlist search_list;
+        initList(&search_list);
+        int search_idCounter = 1;
+        where_position_recommended_screen(renderer,&e,&font_collection, &select);
+        select_position_algorithm(renderer, &e, &font_collection, &select, &what_choice);
+        if (what_choice == 0) {
+            printf("find strikers");
+            findStrikers(&player_list, &search_list, &search_idCounter);
+        }
+        else if (what_choice == 1) {
+            printf("find wingers");
+            findWingers(&player_list,&search_list,&search_idCounter);
+        }
+        else if (what_choice == 2) {
+            printf("find wide mid");
+            findWideMidfielders(&player_list,&search_list,&search_idCounter);
+        }
+        else if (what_choice == 3) {
+            printf("find central mid");
+            findCentralMidfielders(&player_list,&search_list,&search_idCounter);
+        }
+        else if (what_choice == 4) {
+            printf("find attack mid");
+            findAttackingMidfielders(&player_list,&search_list,&search_idCounter);
+        }
+        else if (what_choice == 5) {
+            printf("find defense mid");
+            findDefensiveMidfielders(&player_list,&search_list,&search_idCounter);
+        }
+        else if (what_choice == 6) {
+            printf("find full back");
+            findFullbacks(&player_list, &search_list, &search_idCounter);
+        }
+        else if (what_choice == 7) {
+            printf("find wing back");
+            findWingBacks(&player_list,&search_list, &search_idCounter);
+        }
+        else if (what_choice == 8) {
+            printf("find center back");
+            findCenterBacks(&player_list, &search_list, &search_idCounter);
+        }
+        else if (what_choice == 9) {
+            printf("find goalkeeper");
+            findGoalkeepers(&player_list, &search_list, &search_idCounter);
+        }
+        player_data_screen(renderer,&e,&font_collection,&search_list,&search_idCounter, &home_quit);
+
+    }
     
-    if (what_choice == 0) {
-        printf("find strikers");
-        findStrikers(&player_list, &search_list, &search_idCounter);
-    }
-    else if (what_choice == 1) {
-        printf("find wingers");
-        findWingers(&player_list,&search_list,&search_idCounter);
-    }
-    else if (what_choice == 2) {
-        printf("find wide mid");
-        findWideMidfielders(&player_list,&search_list,&search_idCounter);
-    }
-    else if (what_choice == 3) {
-        printf("find central mid");
-        findCentralMidfielders(&player_list,&search_list,&search_idCounter);
-    }
-    else if (what_choice == 4) {
-        printf("find attack mid");
-        findAttackingMidfielders(&player_list,&search_list,&search_idCounter);
-    }
-    else if (what_choice == 5) {
-        printf("find defense mid");
-        findDefensiveMidfielders(&player_list,&search_list,&search_idCounter);
-    }
-    else if (what_choice == 6) {
-        printf("find full back");
-        findFullbacks(&player_list, &search_list, &search_idCounter);
-    }
-    else if (what_choice == 7) {
-        printf("find wing back");
-        findWingBacks(&player_list,&search_list, &search_idCounter);
-    }
-    else if (what_choice == 8) {
-        printf("find center back");
-        findCenterBacks(&player_list, &search_list, &search_idCounter);
-    }
-    else if (what_choice == 9) {
-        printf("find goalkeeper");
-        findGoalkeepers(&player_list, &search_list, &search_idCounter);
-    }
-    player_data_screen(renderer,&e,&font_collection,&search_list,&search_idCounter);
     
     TTF_CloseFont(font_collection.font10);
     TTF_CloseFont(font_collection.font20);
