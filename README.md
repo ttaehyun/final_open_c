@@ -6,7 +6,7 @@
 
 - Button 구조체 : Button에 필요한 변수명 모음
 
-- Player 구조체
+- Player 구조체 \n
   (선수 신체 능력치) (선수 발 능력치) (선수 세부 스탯)
   - 이름
   - 포지션
@@ -26,7 +26,7 @@
   - 급여
   - UID
 
-- 이중 연결 리스트 순환 구조
+- 이중 연결 리스트 순환 구조 \n
   typedef struct Node {
     Player player;
     int id;
@@ -38,10 +38,10 @@
     Node* head;
   } Circularlist;
 
-- readCSV()
+- readCSV() \n
   엑셀 파일에서 선수 데이터 불러오기
 
-- 선수 찾기
+- 선수 찾기 \n
   findStrikers()
   findWingers()
   findWideMidfielders()
@@ -53,11 +53,11 @@
   findCenterBacks()
   findGoalkeepers()
 
-- startMain()
+- startMain() \n
   초기 시작화면
-- where_position_recommended_screen()
+- where_position_recommended_screen() \n
   포지션 선택
-- select_position_algorithm()
+- select_position_algorithm() \n
   포지션 세부적인 알고리즘 선택
-- player_data_screen()
+- player_data_screen() \n
   찾은 선수 화면 출력
