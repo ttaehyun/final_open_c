@@ -8,6 +8,7 @@
 
 #define MAX_LINE_LENGTH 1024
 
+//에러 처리 함수
 void logSDLError(const char *msg) {
     fprintf(stderr, "%s error: %s\n", msg, SDL_GetError());
 }
@@ -15,7 +16,6 @@ void logSDLError(const char *msg) {
 void logTTFError(const char *msg) {
     fprintf(stderr, "%s error: %s\n", msg, TTF_GetError());
 }
-// struct 
 
 //font크기 모음 구조체
 typedef struct Fonts {
@@ -29,11 +29,13 @@ typedef struct Fonts {
     TTF_Font* font60;
 } Fonts;
 
+// Button 내부에 필요 모음 구조체
 typedef struct Box {
     SDL_Rect rect;
     SDL_Color background_color;
     SDL_Texture* texture;
 } Box;
+
 typedef struct Button {
     Box box;
     SDL_Color textColor;
@@ -41,7 +43,7 @@ typedef struct Button {
     TTF_Font* font;
 } Button;
 
-
+// 글자 출력 함수
 SDL_Texture* renderText(SDL_Renderer *renderer, TTF_Font *font, const char *text, SDL_Color color) {
     SDL_Surface *surface = TTF_RenderText_Solid(font, text, color);
     if (surface == NULL) {
@@ -55,16 +57,18 @@ SDL_Texture* renderText(SDL_Renderer *renderer, TTF_Font *font, const char *text
     }
     return texture;
 }
-
+// Box 화면 출력 함수
 void renderBox(SDL_Renderer* r, SDL_Rect rect, SDL_Color color) {
     SDL_SetRenderDrawColor(r,color.r,color.g,color.b,color.a);
     SDL_RenderFillRect(r, &rect);
 }
+//마우스가 버튼 위에 있는지 확인하는 함수
 bool isMouseOverButton(Button button, int x, int y) {
     return x >= button.box.rect.x && x <= button.box.rect.x + button.box.rect.w &&
            y >= button.box.rect.y && y <= button.box.rect.y + button.box.rect.h;
 }
 
+//화면에 버튼 출력 함수
 void renderButton(SDL_Renderer *renderer, Button button) {
     SDL_SetRenderDrawColor(renderer, button.box.background_color.r, button.box.background_color.g, button.box.background_color.b, button.box.background_color.a);
     SDL_RenderFillRect(renderer, &button.box.rect);
@@ -74,19 +78,20 @@ void renderButton(SDL_Renderer *renderer, Button button) {
     SDL_Rect dstRect = {button.box.rect.x + (button.box.rect.w - texW) / 2, button.box.rect.y + (button.box.rect.h - texH) / 2, texW, texH};
     SDL_RenderCopy(renderer, button.box.texture, NULL, &dstRect);
 }
-//선수 데이터 구조체
 
+//선수 데이터 구조체
+//신체 능력치
 typedef struct Body {
     int height;
     int weight;
 } Body;
-
+//발 능력치
 typedef struct Foot_ability
 {
     int left;
     int right;
 } Foot_ability;
-
+//선수 세부 스탯
 typedef struct Ability_stat{
     int corners;            int crossing;       int dribbling;          int finishing;              int first_touch;
     int free_kick_taking;   int heading;        int long_shot;          int long_throws;            int marking;
@@ -101,7 +106,7 @@ typedef struct Ability_stat{
     int throwing;           int adaptation;     int ambition;           int argue;                  int loyal; 
     int professional;       int sportmanship;   int emotional_control;  int punching;               int resistant_to_stress;
 } Ability_stat;
-
+//포지션별 능력치
 typedef struct Position_stat {
     //GK
     int GK;
@@ -112,7 +117,7 @@ typedef struct Position_stat {
     //attacker
     int AML; int AMC; int AMR; int ST;
 } Position_stat;
-
+//선수 내부 필요 데이터
 typedef struct Player {
     char name[100];
     char position[100];
@@ -137,11 +142,12 @@ typedef struct Player {
     int UID;
 
 } Player;
-
+//x,y좌표
 typedef struct pos{
     int x;
     int y;
 } pos;
+//세부 능력치 별 출력 위치 모음
 typedef struct ability_pos {
     pos corners;            pos crossing;       pos dribbling;          pos finishing;              pos first_touch;
     pos free_kick_taking;   pos heading;        pos long_shot;          pos long_throws;            pos marking;
@@ -156,6 +162,7 @@ typedef struct ability_pos {
     pos throwing;           pos adaptation;     pos ambition;           pos argue;                  pos loyal; 
     pos professional;       pos sportmanship;   pos emotional_control;  pos punching;               pos resistant_to_stress;
 } ability_pos;
+//포지션 별 출력 위치 모음
 typedef struct position_pos {
     //GK
     pos GK;
@@ -166,6 +173,7 @@ typedef struct position_pos {
     //attacker
     pos AML; pos AMC; pos AMR; pos ST;
 } position_pos;
+//선수 데이터 출력 위치 모음
 typedef struct data_pos{
     pos numId;
     pos name;
@@ -192,20 +200,22 @@ typedef struct data_pos{
     pos UID;
 } Data_pos;
 
+//연결리스트 구조체
 typedef struct Node {
     Player player;
     int id;
     struct Node* prev;
     struct Node* next;
 } Node;
-
+//순환 연결리스트를 위한 첫 노드 
 typedef struct Circularlist {
     Node* head;
 } Circularlist;
-
+//노드 초기화
 void initList(Circularlist* list) {
     list->head = NULL;
 }
+//노드 생성 함수 
 Node* createNode(Player player,int id) {
     Node* newNode = (Node*)malloc(sizeof(Node));
     newNode->player = player;
@@ -213,7 +223,7 @@ Node* createNode(Player player,int id) {
     newNode->next = NULL;
     return newNode;
 }
-
+//노드 추가 함수
 void appendNode(Circularlist* list, Player player, int* idCounter) {
     Node* newNode = createNode(player,(*idCounter)++);
     if (list->head == NULL) {
@@ -229,26 +239,13 @@ void appendNode(Circularlist* list, Player player, int* idCounter) {
         list->head->prev = newNode;
     }
 }
-
-void printList(Circularlist* list) {
-    if (list->head == NULL) {
-        printf("List is empty\n");
-        return;
-    }
-    Node* current = list->head;
-    do {
-        printf("Name: %s, Position: %s, Age: %d, UID: %d\n", current->player.name, current->player.position, current->player.age, current->player.UID);
-        current = current->next;
-    } while (current != list->head);
-}
-
+//엑셀 파일에서 선수 데이터 불러오는 함수
 void readCSV(const char* filename, Circularlist* list,int* idCounter) {
     FILE* file = fopen(filename, "r");
     if (file == NULL) {
         perror("Unable to open file");
         return;
     }
-
     
     char line[MAX_LINE_LENGTH];
     Player player;
@@ -403,20 +400,9 @@ void readCSV(const char* filename, Circularlist* list,int* idCounter) {
     fclose(file);
 }
 
-void searchPlayer(Circularlist* player_list, Circularlist* search_list,int* idCounter) {
-    if (player_list->head == NULL) {
-        printf("List is empty\n");
-        return;
-    }
-    Node* current = player_list->head;
-    do {
-        if (current->player.pa > 170 && current->player.ca <150 && current->player.age < 20) {
-            appendNode(search_list,current->player, idCounter);
-        }
-        current = current->next;
-    } while (current != player_list->head);
-}
-//선수 찾기
+//선수 찾기 알고리즘
+
+//스트라이커 찾기 함수
 void findStrikers(Circularlist* player_list,Circularlist* search_list, int* idCounter) {
     
     if (player_list->head == NULL) {
@@ -453,7 +439,7 @@ void findStrikers(Circularlist* player_list,Circularlist* search_list, int* idCo
     }
     while (current != player_list->head);
 }
-
+// 윙어 찾기
 void findWingers(Circularlist* player_list,Circularlist* search_list, int* idCounter) {
     if (player_list->head == NULL) {
         printf("List is empty\n");
@@ -485,6 +471,7 @@ void findWingers(Circularlist* player_list,Circularlist* search_list, int* idCou
     }
     while (current != player_list->head);
 }
+//측면 미드필더 찾기
 void findWideMidfielders(Circularlist* player_list,Circularlist* search_list, int* idCounter) {
     if (player_list->head == NULL) {
         printf("List is empty\n");
@@ -520,6 +507,7 @@ void findWideMidfielders(Circularlist* player_list,Circularlist* search_list, in
     }
     while (current != player_list->head); 
 }
+// 중앙 미드필더 선수 찾기
 void findCentralMidfielders(Circularlist* player_list,Circularlist* search_list, int* idCounter) {
     if (player_list->head == NULL) {
         printf("List is empty\n");
@@ -555,6 +543,7 @@ void findCentralMidfielders(Circularlist* player_list,Circularlist* search_list,
     }
     while (current != player_list->head);   
 }
+// 공격형 미드필더 찾기 
 void findAttackingMidfielders(Circularlist* player_list,Circularlist* search_list, int* idCounter) {
     if (player_list->head == NULL) {
         printf("List is empty\n");
@@ -590,6 +579,7 @@ void findAttackingMidfielders(Circularlist* player_list,Circularlist* search_lis
     }
     while (current != player_list->head);  
 }
+//수비형 미드필더 찾기
 void findDefensiveMidfielders(Circularlist* player_list,Circularlist* search_list, int* idCounter) {
     if (player_list->head == NULL) {
         printf("List is empty\n");
@@ -621,6 +611,7 @@ void findDefensiveMidfielders(Circularlist* player_list,Circularlist* search_lis
     }
     while (current != player_list->head);
 }
+// 풀백 찾기
 void findFullbacks(Circularlist* player_list,Circularlist* search_list, int* idCounter) {
     if (player_list->head == NULL) {
         printf("List is empty\n");
@@ -654,6 +645,7 @@ void findFullbacks(Circularlist* player_list,Circularlist* search_list, int* idC
     }
     while (current != player_list->head);   
 }
+// 윙백 찾기
 void findWingBacks(Circularlist* player_list,Circularlist* search_list, int* idCounter) {
     if (player_list->head == NULL) {
         printf("List is empty\n");
@@ -689,6 +681,7 @@ void findWingBacks(Circularlist* player_list,Circularlist* search_list, int* idC
     }
     while (current != player_list->head);
 }
+//센터백 찾기
 void findCenterBacks(Circularlist* player_list,Circularlist* search_list, int* idCounter) {
     if (player_list->head == NULL) {
         printf("List is empty\n");
@@ -724,6 +717,7 @@ void findCenterBacks(Circularlist* player_list,Circularlist* search_list, int* i
     }
     while (current != player_list->head); 
 }
+// 골키퍼 찾기
 void findGoalkeepers(Circularlist* player_list,Circularlist* search_list, int* idCounter) {
     if (player_list->head == NULL) {
         printf("List is empty\n");
@@ -759,6 +753,7 @@ void findGoalkeepers(Circularlist* player_list,Circularlist* search_list, int* i
     }
     while (current != player_list->head);
 }
+//초기 시작 화면 함수
 void startMain(SDL_Renderer* r, SDL_Event* e,Fonts* fonts) {
     SDL_Color textColor = {0,0,0,255};
     SDL_Color box_color = {255,255,255,255};
@@ -811,7 +806,7 @@ void startMain(SDL_Renderer* r, SDL_Event* e,Fonts* fonts) {
     SDL_DestroyTexture(titleBox.box.texture);   
     SDL_DestroyTexture(startButton.box.texture);
 }
-
+// 포지션 선택 함수
 void where_position_recommended_screen(SDL_Renderer* r, SDL_Event* e, Fonts* fonts,int* select) {
     SDL_Color textColor = {0,0,0,255};
     SDL_Color box_color = {255,255,255,255};
@@ -904,7 +899,7 @@ void where_position_recommended_screen(SDL_Renderer* r, SDL_Event* e, Fonts* fon
     SDL_DestroyTexture(attackerButton.box.texture); SDL_DestroyTexture(midfielderButton.box.texture); SDL_DestroyTexture(defenderButton.box.texture); SDL_DestroyTexture(goalkeeperButton.box.texture);
     
 }
-
+// 포지션 세부적인 알고리즘 선택 함수
 void select_position_algorithm(SDL_Renderer* r, SDL_Event* e, Fonts* fonts,int* select,int* what_choice) {
     SDL_Color textColor = {0,0,0,255};
     SDL_Color box_color = {255,255,255,255};
@@ -1078,7 +1073,7 @@ void select_position_algorithm(SDL_Renderer* r, SDL_Event* e, Fonts* fonts,int* 
     SDL_DestroyTexture(attackMid.box.texture); SDL_DestroyTexture(defenseMid.box.texture); SDL_DestroyTexture(fullback.box.texture); SDL_DestroyTexture(wingback.box.texture);
     SDL_DestroyTexture(wingback.box.texture); SDL_DestroyTexture(centerback.box.texture); 
 }
-
+// 정수형을 char 형태로 바꿔주는 함수
 char* to_char(int num) {
     // 버퍼 크기를 충분히 크게 설정합니다.
     size_t buffer_size = 12; // 일반적으로 int의 범위 내에서 12 바이트는 충분합니다.
@@ -1090,7 +1085,7 @@ char* to_char(int num) {
     snprintf(buffer, buffer_size, "%d", num);
     return buffer;
 }
-
+// 찾은 선수들 화면 출력 함수
 void player_data_screen(SDL_Renderer* r, SDL_Event* e, Fonts* fonts, Circularlist* list, int* idCounter, bool* home_quit) {
     Node* current = list->head;
 
@@ -2321,8 +2316,8 @@ void player_data_screen(SDL_Renderer* r, SDL_Event* e, Fonts* fonts, Circularlis
 
 
 }
-//선수 찾기
 
+// 메인 함수
 int main() {
     int w = 1480;
     int h = 800;
